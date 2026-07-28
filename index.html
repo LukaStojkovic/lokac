@@ -1,0 +1,2057 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+    <title>Za Lolu — Mali Univerzum</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Quicksand:wght@300;400;500;600&family=Poppins:wght@800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --ink-deep: #05061a;
+        --ink-mid: #10123a;
+        --ink-violet: #241854;
+        --star-pale: #eef1ff;
+        --star-blue: #b9c8ff;
+        --accent-glow: #cbb4ff;
+        --accent-gold: #ffe3b0;
+        --text-soft: #f2eefc;
+        --text-muted: #b7b3d6;
+        --display-font: "Cormorant Garamond", "Georgia", serif;
+        --body-font: "Quicksand", -apple-system, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--ink-deep);
+        color: var(--text-soft);
+        font-family: var(--body-font);
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      #sky {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        z-index: 0;
+        touch-action: pan-y;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+      }
+
+      .phase {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 8vh 8vw;
+        pointer-events: none;
+      }
+
+      .phase-inner {
+        max-width: 640px;
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 1.1s ease,
+          transform 1.1s ease;
+      }
+      .phase-inner.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .eyebrow {
+        font-family: var(--body-font);
+        font-weight: 500;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        margin: 0 0 1.1rem;
+      }
+
+      .headline {
+        font-family: var(--display-font);
+        font-weight: 500;
+        font-style: italic;
+        font-size: clamp(1.6rem, 4.6vw, 2.9rem);
+        line-height: 1.25;
+        margin: 0 0 0.9rem;
+        color: var(--text-soft);
+        text-shadow: 0 0 26px rgba(203, 180, 255, 0.35);
+      }
+
+      .subtext {
+        font-family: var(--body-font);
+        font-weight: 400;
+        font-size: clamp(0.92rem, 2vw, 1.05rem);
+        color: var(--text-muted);
+        line-height: 1.7;
+        margin: 0;
+      }
+
+      .phase-1 .headline {
+        font-size: clamp(1.8rem, 5.5vw, 3.3rem);
+      }
+      .phase-2 .phase-inner {
+        max-width: 480px;
+      }
+      .phase-3 {
+        min-height: 150vh;
+        align-items: flex-start;
+        padding-top: 14vh;
+      }
+      .phase-4 {
+        min-height: 130vh;
+        align-items: flex-end;
+        padding-bottom: 10vh;
+      }
+
+      .sr-only-heading {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+      }
+
+      .final-note {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: clamp(1.1rem, 2.6vw, 1.4rem);
+        color: var(--text-soft);
+        line-height: 1.7;
+        margin: 0 0 1.8rem;
+        text-shadow: 0 0 20px rgba(203, 180, 255, 0.3);
+      }
+
+      .cta-button {
+        pointer-events: auto;
+        font-family: var(--body-font);
+        font-weight: 600;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        color: var(--ink-deep);
+        background: linear-gradient(
+          135deg,
+          var(--star-pale),
+          var(--accent-glow)
+        );
+        border: none;
+        border-radius: 999px;
+        padding: 0.95rem 2.1rem;
+        cursor: pointer;
+        box-shadow: 0 0 0 rgba(203, 180, 255, 0);
+        transition:
+          transform 0.25s ease,
+          box-shadow 0.35s ease;
+      }
+      .cta-button:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 8px 30px rgba(203, 180, 255, 0.45);
+      }
+      .cta-button:active {
+        transform: translateY(0) scale(0.98);
+      }
+
+      .scroll-cue {
+        margin-top: 2.6rem;
+        font-size: 0.7rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        animation: floatCue 2.6s ease-in-out infinite;
+      }
+      @keyframes floatCue {
+        0%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.55;
+        }
+        50% {
+          transform: translateY(8px);
+          opacity: 1;
+        }
+      }
+
+      #tooltip {
+        position: fixed;
+        z-index: 5;
+        max-width: 240px;
+        padding: 0.65rem 0.95rem;
+        background: rgba(16, 18, 58, 0.82);
+        border: 1px solid rgba(203, 180, 255, 0.35);
+        border-radius: 14px;
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        color: var(--text-soft);
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 0.92rem;
+        line-height: 1.45;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+        pointer-events: none;
+        opacity: 0;
+        transform: translate(-50%, calc(-100% - 14px)) scale(0.96);
+        transition:
+          opacity 0.28s ease,
+          transform 0.28s ease;
+        will-change: opacity, transform;
+      }
+      #tooltip.visible {
+        opacity: 1;
+        transform: translate(-50%, calc(-100% - 18px)) scale(1);
+      }
+      #tooltip::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: -6px;
+        width: 12px;
+        height: 12px;
+        background: inherit;
+        border-right: 1px solid rgba(203, 180, 255, 0.35);
+        border-bottom: 1px solid rgba(203, 180, 255, 0.35);
+        transform: translateX(-50%) rotate(45deg);
+      }
+
+      #wishToast {
+        position: fixed;
+        left: 50%;
+        bottom: 8%;
+        z-index: 6;
+        transform: translate(-50%, 12px);
+        padding: 0.7rem 1.2rem;
+        max-width: min(86vw, 380px);
+        text-align: center;
+        background: rgba(16, 18, 58, 0.85);
+        border: 1px solid rgba(203, 180, 255, 0.4);
+        border-radius: 999px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        color: var(--text-soft);
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 0.95rem;
+        box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+        pointer-events: none;
+        opacity: 0;
+        transition:
+          opacity 0.35s ease,
+          transform 0.35s ease;
+      }
+      #wishToast.visible {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      .tap-hint {
+        margin-top: 0.6rem;
+        font-size: 0.72rem;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        opacity: 0.85;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .scroll-cue {
+          animation: none;
+        }
+        .phase-inner {
+          transition: opacity 0.4s linear;
+          transform: none !important;
+        }
+      }
+
+      /* ---------- Mini-games section ---------- */
+      .phase-games {
+        min-height: 100vh;
+        padding-bottom: 14vh;
+      }
+      .games-inner {
+        max-width: 480px;
+      }
+      .game-picker {
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        margin-top: 1.8rem;
+      }
+      .game-card {
+        pointer-events: auto;
+        display: flex;
+        align-items: center;
+        gap: 0.95rem;
+        text-align: left;
+        padding: 0.95rem 1.15rem;
+        border-radius: 18px;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-soft);
+        cursor: pointer;
+        font-family: var(--body-font);
+        transition:
+          transform 0.25s ease,
+          background 0.25s ease,
+          box-shadow 0.3s ease;
+      }
+      .game-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 26px rgba(203, 180, 255, 0.18);
+      }
+      .game-card:active {
+        transform: translateY(0) scale(0.99);
+      }
+      .game-card-icon {
+        font-size: 1.7rem;
+        flex-shrink: 0;
+        filter: drop-shadow(0 0 8px rgba(203, 180, 255, 0.45));
+      }
+      .game-card-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+      }
+      .game-card-title {
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+      .game-card-desc {
+        font-size: 0.76rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      /* ---------- Game overlay ---------- */
+      .game-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(5, 6, 26, 0.55);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .game-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .game-panel {
+        position: relative;
+        width: min(92vw, 440px);
+        max-height: 84vh;
+        overflow-y: auto;
+        background: linear-gradient(
+          160deg,
+          rgba(16, 18, 58, 0.94),
+          rgba(36, 24, 84, 0.94)
+        );
+        border: 1px solid rgba(203, 180, 255, 0.35);
+        border-radius: 24px;
+        padding: 1.9rem 1.4rem 1.7rem;
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+        transform: translateY(10px) scale(0.97);
+        transition:
+          transform 0.32s ease,
+          opacity 0.32s ease;
+      }
+      .game-overlay.visible .game-panel {
+        transform: translateY(0) scale(1);
+      }
+      .game-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1px solid rgba(203, 180, 255, 0.4);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-soft);
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .game-title {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.3rem;
+        margin: 0 0 0.3rem;
+        padding-right: 34px;
+        color: var(--text-soft);
+      }
+      .game-subtitle {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin: 0 0 1.1rem;
+        line-height: 1.5;
+      }
+
+      /* Memory game */
+      .memory-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+      }
+      .memory-card {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        cursor: pointer;
+        user-select: none;
+        color: var(--text-soft);
+        transition:
+          transform 0.2s ease,
+          background 0.3s ease;
+      }
+      .memory-card.flipped {
+        background: rgba(203, 180, 255, 0.2);
+        transform: scale(1.03);
+      }
+      .memory-card.matched {
+        background: rgba(203, 180, 255, 0.12);
+        opacity: 0.5;
+        cursor: default;
+      }
+      .game-hud {
+        margin-top: 0.9rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        text-align: center;
+      }
+
+      /* Star catcher */
+      .catcher-stage {
+        position: relative;
+        height: 320px;
+        border-radius: 18px;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at 50% 15%,
+            rgba(203, 180, 255, 0.1),
+            transparent 60%
+          ),
+          rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(203, 180, 255, 0.25);
+      }
+      .catcher-star {
+        position: absolute;
+        font-size: 1.55rem;
+        cursor: pointer;
+        user-select: none;
+        filter: drop-shadow(0 0 6px rgba(203, 180, 255, 0.65));
+      }
+      .catcher-hud {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.7rem;
+      }
+
+      /* Quiz */
+      .quiz-progress {
+        font-size: 0.7rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin: 0 0 0.6rem;
+      }
+      .quiz-question {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.12rem;
+        margin: 0 0 1.1rem;
+        color: var(--text-soft);
+      }
+      .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.55rem;
+      }
+      .quiz-option {
+        padding: 0.72rem 1rem;
+        border-radius: 13px;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-soft);
+        text-align: left;
+        cursor: pointer;
+        font-family: var(--body-font);
+        font-size: 0.9rem;
+        transition:
+          background 0.25s ease,
+          border-color 0.25s ease;
+      }
+      .quiz-option:disabled {
+        cursor: default;
+      }
+      .quiz-option.correct {
+        background: rgba(150, 255, 180, 0.16);
+        border-color: rgba(150, 255, 180, 0.5);
+      }
+      .quiz-option.wrong {
+        background: rgba(255, 140, 140, 0.14);
+        border-color: rgba(255, 140, 140, 0.4);
+      }
+
+      /* Shared result screen */
+      .game-result {
+        text-align: center;
+        padding-top: 0.6rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .game-result h3 {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.35rem;
+        margin: 0 0 0.5rem;
+        color: var(--text-soft);
+      }
+      .game-result .subtext {
+        margin-bottom: 1.3rem;
+      }
+      .game-result .cta-button {
+        width: 100%;
+        margin-bottom: 0.65rem;
+      }
+      .game-secondary-btn {
+        background: transparent !important;
+        color: var(--text-soft) !important;
+        border: 1px solid rgba(203, 180, 255, 0.35);
+        box-shadow: none !important;
+      }
+      /* Photo puzzle */
+      .puzzle-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.9rem;
+      }
+      .puzzle-preview {
+        width: 96px;
+        border-radius: 10px;
+        border: 1px solid rgba(203, 180, 255, 0.35);
+        opacity: 0.85;
+      }
+      .puzzle-preview-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin: -0.4rem 0 0;
+      }
+      .puzzle-board {
+        display: grid;
+        grid-template-columns: repeat(var(--puzzle-grid), 1fr);
+        gap: 4px;
+        width: 100%;
+        aspect-ratio: 1;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+      }
+      .puzzle-tile {
+        border: none;
+        padding: 0;
+        margin: 0;
+        cursor: pointer;
+        background-repeat: no-repeat;
+        transition:
+          transform 0.15s ease,
+          outline-color 0.15s ease;
+      }
+      .puzzle-tile.selected {
+        outline: 3px solid rgba(203, 180, 255, 0.9);
+        outline-offset: -3px;
+        transform: scale(0.95);
+      }
+      .puzzle-missing {
+        text-align: center;
+        padding: 0.6rem 0;
+      }
+      .puzzle-missing code {
+        display: inline-block;
+        margin-top: 0.4rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        font-size: 0.78rem;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="sky" aria-hidden="true"></canvas>
+    <div id="tooltip" role="status"></div>
+    <div id="wishToast" role="status"></div>
+
+    <main>
+      <section class="phase phase-1" data-phase="1">
+        <div class="phase-inner">
+          <p class="eyebrow">mali univerzum, za tebe</p>
+
+          <h1 class="headline">Dobrodošla u moj mali univerzum za tebe…</h1>
+
+          <p class="subtext">
+            Svaka zvezda ovde pamti nešto. Nastavi da skroluješ.
+          </p>
+
+          <div class="scroll-cue">skroluj ↓</div>
+        </div>
+      </section>
+
+      <section class="phase phase-2" data-phase="2">
+        <div class="phase-inner">
+          <p class="eyebrow">negde između februara i sada</p>
+          <!-- EDIT ME: mid-scroll line -->
+          <h1 class="headline">
+            Svaka kasna noć, svaka glupa šala, svako "još jedna igra" — sve je
+            još uvek ovde.
+          </h1>
+          <p class="subtext">Pređi preko zvezde. Reći će ti nešto.</p>
+        </div>
+      </section>
+
+      <section class="phase phase-3" data-phase="3">
+        <div class="phase-inner">
+          <p class="eyebrow">pažljivo gledaj</p>
+          <!-- EDIT ME: transition line -->
+          <h1 class="headline">Više ne lutaju. One ispisuju nešto.</h1>
+        </div>
+      </section>
+
+      <section class="phase phase-4" data-phase="4">
+        <h2 class="sr-only-heading">Srecan rodjedan Lola</h2>
+        <div class="phase-inner">
+          <!-- EDIT ME: closing note -->
+          <p class="final-note">
+            Srećan rođendan, Lola.<br />
+            Za sve galaksije koje još nismo istražili.
+          </p>
+
+          <button class="cta-button" id="wishButton" type="button">
+            Zamisli zelju 🖤
+          </button>
+        </div>
+      </section>
+
+      <section class="phase phase-games" data-phase="5">
+        <div class="phase-inner games-inner">
+          <!-- <p class="eyebrow">bonus za rođendan</p> -->
+          <h1 class="headline">Mini igre</h1>
+          <p class="subtext">Izaberi igru</p>
+
+          <div class="game-picker">
+            <button class="game-card" data-game="memory" type="button">
+              <span class="game-card-icon">🧠</span>
+              <span class="game-card-text">
+                <span class="game-card-title">Memory game</span>
+                <span class="game-card-desc">Spoji sve parove</span>
+              </span>
+            </button>
+            <button class="game-card" data-game="catcher" type="button">
+              <span class="game-card-icon">⭐</span>
+              <span class="game-card-text">
+                <span class="game-card-title">Catch stars</span>
+                <span class="game-card-desc"
+                  >Uhvati sto vise zvezda u 25 sekundi</span
+                >
+              </span>
+            </button>
+            <button class="game-card" data-game="quiz" type="button">
+              <span class="game-card-icon">🖤</span>
+              <span class="game-card-text">
+                <span class="game-card-title">Mini quiz</span>
+                <span class="game-card-desc">Mali kviz</span>
+              </span>
+            </button>
+            <button class="game-card" data-game="puzzle" type="button">
+              <span class="game-card-icon">🧩</span>
+              <span class="game-card-text">
+                <span class="game-card-title">Puzzle</span>
+                <span class="game-card-desc">Spoji sve delove</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="game-overlay" id="gameOverlay" aria-hidden="true">
+      <div class="game-panel">
+        <button
+          class="game-close"
+          id="gameClose"
+          type="button"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <div class="game-container" id="gameContainer"></div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        const CONFIG = {
+          starCount: 260,
+          letterMinStars: 340,
+          letterMaxStars: 2400,
+          maxLinkDistance: 130,
+          linksPerStar: 5,
+          hoverRadius: 40,
+          shootingStarChance: 0.018,
+          message: "SRECAN RODJEDAN LOLA 🖤",
+          reducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)")
+            .matches,
+        };
+
+        const PHASE_BOUNDS = {
+          starfieldEnd: 0.18,
+          linksStart: 0.18,
+          linksPeakEnd: 0.42,
+          lerpStart: 0.42,
+          lerpEnd: 0.8,
+          finalGlowStart: 0.8,
+        };
+
+        const STAR_MESSAGES = [
+          "Svaki put kad mi se javiš, ulepšaš mi veče",
+          "Ova zvezda pamti da mi nisi nikad rekla kako se zove pesma 'vrati se meni vrati'",
+          "Ova zvezda pamti svaki game koji si iztrollala",
+          "Ova zvezda pamti svaki poziv ujutru pre prakse i posla",
+          "Ova zvezda pamti svako moje 'ne znam'",
+          "Ova zvezda pamti svaki poslat tiktok",
+          "Ova zvezda pamti svaki kanter koji smo odigrali",
+          "Ova zvezda pamti svaki ulepsan dan",
+          "Ova zvezda pamti nas prvi susret",
+          "Ova zvezda pamti svaki put kad si mi rekla da sam bebica",
+          "Ova zvezda pamti svaki put kad si mi rekla da ces da me prebijes",
+          "Ova zvezda pamti nas prvi odgledan film (Obssesion)",
+          "Ova zvezda pamti 30.01.2026.",
+          "Još nisam preboleo onu partiju koju smo skoro dobili",
+          "Način na koji 'vraćam se za 5 min' uvek postane 2 sata",
+          "Ona poruka koja mi je izmamila osmeh za ceo dan",
+          "Nekako obične dane pretvaraš u posebne planove",
+        ];
+
+        const WISH_MESSAGES = [
+          "Mala želja, posađena ✨",
+          "Ova je sada tvoja 🌟",
+          "Nešto lepo, samo za danas",
+          "Mala zvezda za malu želju",
+          "Poslato u nebo 🎉",
+          "Još jedna zvezda, tek tako",
+        ];
+
+        const SHOOTING_MESSAGES = [
+          "Uhvatila si jednu — zamisli želju! 🌠",
+
+          "Želja zamisljena ✨",
+
+          "To je srećna zvezda",
+
+          "Brzo, zamisli želju!",
+        ];
+
+        const canvas = document.getElementById("sky");
+        const ctx = canvas.getContext("2d");
+        const tooltip = document.getElementById("tooltip");
+        const wishToast = document.getElementById("wishToast");
+        const wishButton = document.getElementById("wishButton");
+
+        let W = 0,
+          H = 0,
+          DPR = Math.min(window.devicePixelRatio || 1, 2);
+        let stars = [];
+        let shootingStars = [];
+        let sparkles = [];
+        let scrollProgress = 0;
+        let hoveredStar = null;
+        let letterSpacing = 20;
+        let activeTooltipTimeout = null;
+        let activeToastTimeout = null;
+        let time = 0;
+        let lastFrame = performance.now();
+
+        class Star {
+          constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.originX = x;
+            this.originY = y;
+            this.targetX = null;
+            this.targetY = null;
+            this.isLetter = false;
+            this.isWish = false;
+            this.radius = 0.7 + Math.random() * 1.7;
+            this.baseBrightness = 0.45 + Math.random() * 0.55;
+            this.twinkleSeed = Math.random() * Math.PI * 2;
+            this.twinkleSpeed = 0.4 + Math.random() * 0.8;
+            const driftScale = CONFIG.reducedMotion ? 0 : 0.055;
+            this.vx = (Math.random() - 0.5) * driftScale;
+            this.vy = (Math.random() - 0.5) * driftScale;
+            this.message =
+              STAR_MESSAGES[Math.floor(Math.random() * STAR_MESSAGES.length)];
+            this.hue = Math.random() < 0.7 ? "pale" : "blue";
+          }
+
+          update(letterT) {
+            if (this.isWish) return; // planted stars stay put
+            if (this.isLetter && letterT > 0) {
+              const ease = easeInOutCubic(letterT);
+              this.x =
+                lerp(this.originX, this.targetX, ease) +
+                Math.sin(time * 0.6 + this.twinkleSeed) * (1 - ease) * 6;
+              this.y =
+                lerp(this.originY, this.targetY, ease) +
+                Math.cos(time * 0.5 + this.twinkleSeed) * (1 - ease) * 6;
+            } else {
+              this.originX += this.vx;
+              this.originY += this.vy;
+              if (this.originX < -20) this.originX = W + 20;
+              if (this.originX > W + 20) this.originX = -20;
+              if (this.originY < -20) this.originY = H + 20;
+              if (this.originY > H + 20) this.originY = -20;
+              this.x = this.originX;
+              this.y = this.originY;
+            }
+          }
+
+          currentBrightness(steadiness) {
+            const amp = 0.25 * (1 - steadiness * 0.75);
+            const twinkle =
+              0.75 +
+              amp * Math.sin(time * this.twinkleSpeed + this.twinkleSeed);
+            return this.baseBrightness * twinkle;
+          }
+
+          draw(finalGlowT) {
+            const b = this.currentBrightness(this.isLetter ? finalGlowT : 0);
+            let color = "238,241,255";
+            if (this.hue === "blue") color = "185,200,255";
+            if (this.hue === "gold") color = "255,227,176";
+            const extraGlow = this.isLetter ? finalGlowT : 0;
+            const wishPulse = this.isWish
+              ? 0.85 + 0.15 * Math.sin(time * 1.6 + this.twinkleSeed)
+              : 1;
+
+            const haloR =
+              this.radius * (2.6 + extraGlow * 0.9) * (this.isWish ? 1.6 : 1);
+            const grad = ctx.createRadialGradient(
+              this.x,
+              this.y,
+              0,
+              this.x,
+              this.y,
+              haloR,
+            );
+            grad.addColorStop(
+              0,
+              `rgba(${color}, ${(0.3 * b + extraGlow * 0.1) * wishPulse})`,
+            );
+            grad.addColorStop(1, `rgba(${color}, 0)`);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, haloR, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(${color}, ${Math.min(1, (b + extraGlow * 0.2) * wishPulse)})`;
+            ctx.arc(
+              this.x,
+              this.y,
+              this.radius * (1 + extraGlow * 0.2) * (this.isWish ? 1.5 : 1),
+              0,
+              Math.PI * 2,
+            );
+            ctx.fill();
+
+            if (this === hoveredStar) {
+              const pulse = 1 + Math.sin(time * 4) * 0.12;
+              ctx.beginPath();
+              ctx.strokeStyle = "rgba(255,255,255,0.75)";
+              ctx.lineWidth = 1.4;
+              ctx.arc(
+                this.x,
+                this.y,
+                (this.radius + 7) * pulse,
+                0,
+                Math.PI * 2,
+              );
+              ctx.stroke();
+            }
+          }
+        }
+
+        function lerp(a, b, t) {
+          return a + (b - a) * t;
+        }
+        function clamp(v, min, max) {
+          return Math.max(min, Math.min(max, v));
+        }
+        function easeInOutCubic(t) {
+          return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        }
+        function pick(arr) {
+          return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateLetterTargets(width, height, text) {
+          const off = document.createElement("canvas");
+          off.width = width;
+          off.height = height;
+          const octx = off.getContext("2d");
+
+          const words = text.split(" ");
+          const glyphFont = (size) =>
+            `900 ${size}px 'Poppins', 'Arial Black', sans-serif`;
+
+          // Available box for the message. On narrow/mobile screens this
+          // lets the text wrap into more (shorter) lines instead of being
+          // squeezed into a fixed 2-line layout, so the font can stay big.
+          const maxLineWidth = width * 0.9;
+          const maxBlockHeight = height * 0.62;
+
+          // We space words manually (rather than relying on the font's own
+          // space glyph) so gaps stay wide and consistent even once the
+          // text gets turned into a sparse cloud of star points — a thin
+          // native space collapses at low sample density and words read as
+          // one blended blob.
+          const wordGapFor = (size) => size * 0.62;
+
+          function lineWidthWithGap(lineWords, size) {
+            const gap = wordGapFor(size);
+            let total = 0;
+            lineWords.forEach((w, idx) => {
+              total += octx.measureText(w).width;
+              if (idx < lineWords.length - 1) total += gap;
+            });
+            return total;
+          }
+
+          function wrapWords(size) {
+            octx.font = glyphFont(size);
+            const lines = [];
+            let current = [];
+            for (const w of words) {
+              const test = [...current, w];
+              const testWidth = lineWidthWithGap(test, size);
+              if (testWidth <= maxLineWidth || current.length === 0) {
+                current = test;
+              } else {
+                lines.push(current);
+                current = [w];
+              }
+            }
+            if (current.length) lines.push(current);
+            return lines;
+          }
+
+          function fitsAt(size) {
+            octx.font = glyphFont(size);
+            const lines = wrapWords(size);
+            const blockHeight = size * 1.3 * lines.length;
+            let widestLine = 0;
+            for (const line of lines) {
+              widestLine = Math.max(widestLine, lineWidthWithGap(line, size));
+            }
+            return {
+              ok: widestLine <= maxLineWidth && blockHeight <= maxBlockHeight,
+              lines,
+            };
+          }
+
+          // Start from a generous size relative to the smaller screen
+          // dimension, then shrink only as much as needed to fit.
+          let fontSize = Math.floor(Math.min(width, height) / 4);
+          let fitResult = fitsAt(fontSize);
+          while (!fitResult.ok && fontSize > 10) {
+            fontSize -= 2;
+            fitResult = fitsAt(fontSize);
+          }
+          const lines = fitResult.lines;
+
+          octx.font = glyphFont(fontSize);
+
+          octx.fillStyle = "#fff";
+          octx.textAlign = "left";
+          octx.textBaseline = "middle";
+          const lineGap = fontSize * 1.3;
+          const centerY = height * 0.46;
+          const totalLines = lines.length;
+          const wordGap = wordGapFor(fontSize);
+          lines.forEach((lineWords, i) => {
+            const y = centerY + (i - (totalLines - 1) / 2) * lineGap;
+            const wordWidths = lineWords.map((w) => octx.measureText(w).width);
+            const totalWidth =
+              wordWidths.reduce((a, b) => a + b, 0) +
+              wordGap * (lineWords.length - 1);
+            let cursorX = width / 2 - totalWidth / 2;
+            lineWords.forEach((w, wi) => {
+              octx.fillText(w, cursorX, y);
+              cursorX += wordWidths[wi] + wordGap;
+            });
+          });
+
+          const probeStep = 2;
+          const imgData = octx.getImageData(0, 0, width, height).data;
+          let litPixelCount = 0;
+          for (let y = 0; y < height; y += probeStep) {
+            for (let x = 0; x < width; x += probeStep) {
+              if (imgData[(y * width + x) * 4 + 3] > 128) litPixelCount++;
+            }
+          }
+          const glyphArea = litPixelCount * probeStep * probeStep;
+
+          const desiredCount = clamp(
+            Math.round(glyphArea / 55),
+            CONFIG.letterMinStars,
+            CONFIG.letterMaxStars,
+          );
+          const step = Math.max(
+            2,
+            Math.round(Math.sqrt(Math.max(glyphArea, 1) / desiredCount)),
+          );
+          const points = [];
+          for (let y = 0; y < height; y += step) {
+            for (let x = 0; x < width; x += step) {
+              if (imgData[(y * width + x) * 4 + 3] > 128) {
+                points.push({
+                  x: x + (Math.random() - 0.5) * step * 0.35,
+                  y: y + (Math.random() - 0.5) * step * 0.35,
+                });
+              }
+            }
+          }
+
+          for (let i = points.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [points[i], points[j]] = [points[j], points[i]];
+          }
+
+          return {
+            points: points.slice(0, CONFIG.letterMaxStars),
+            spacing: step,
+          };
+        }
+
+        function resizeCanvas() {
+          W = window.innerWidth;
+          H = window.innerHeight;
+          canvas.width = W * DPR;
+          canvas.height = H * DPR;
+          canvas.style.width = W + "px";
+          canvas.style.height = H + "px";
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+        }
+
+        function buildStars() {
+          const { points: targets, spacing } = generateLetterTargets(
+            W,
+            H,
+            CONFIG.message,
+          );
+          letterSpacing = spacing;
+          const totalStars = Math.max(CONFIG.starCount, targets.length + 60);
+
+          stars = [];
+          for (let i = 0; i < totalStars; i++) {
+            stars.push(new Star(Math.random() * W, Math.random() * H));
+          }
+
+          const letterCandidates = stars
+            .slice(0, targets.length)
+            .sort((a, b) => a.originX - b.originX);
+          const sortedTargets = targets.slice().sort((a, b) => a.x - b.x);
+
+          letterCandidates.forEach((star, i) => {
+            star.isLetter = true;
+            star.targetX = sortedTargets[i].x;
+            star.targetY = sortedTargets[i].y;
+            star.message = STAR_MESSAGES[i % STAR_MESSAGES.length];
+          });
+        }
+
+        function init() {
+          resizeCanvas();
+          buildStars();
+        }
+
+        let resizeTimeout;
+        window.addEventListener("resize", () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            init();
+          }, 220);
+        });
+
+        const phase4El = document.querySelector(".phase-4");
+
+        function computeScrollProgress() {
+          const storyEnd = phase4El
+            ? phase4El.offsetTop + phase4El.offsetHeight
+            : document.documentElement.scrollHeight;
+          const storyMax = Math.max(1, storyEnd - window.innerHeight);
+          scrollProgress = clamp(window.scrollY / storyMax, 0, 1);
+        }
+
+        let scrollTicking = false;
+        let lastScrollY = window.scrollY;
+        let lastShootingStarAt = 0;
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (!scrollTicking) {
+              requestAnimationFrame(() => {
+                computeScrollProgress();
+                const delta = Math.abs(window.scrollY - lastScrollY);
+                const now = performance.now();
+                if (delta > 4 && now - lastShootingStarAt > 350) {
+                  spawnShootingStar();
+                  lastShootingStarAt = now;
+                }
+                lastScrollY = window.scrollY;
+                scrollTicking = false;
+              });
+              scrollTicking = true;
+            }
+          },
+          { passive: true },
+        );
+
+        const revealObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              const inner = entry.target.querySelector(".phase-inner");
+              if (!inner) return;
+              if (entry.isIntersecting && entry.intersectionRatio > 0.35) {
+                inner.classList.add("visible");
+              } else if (!entry.isIntersecting) {
+                inner.classList.remove("visible");
+              }
+            });
+          },
+          { threshold: [0, 0.35, 0.6] },
+        );
+
+        document
+          .querySelectorAll(".phase")
+          .forEach((section) => revealObserver.observe(section));
+
+        function spawnShootingStar() {
+          if (shootingStars.length >= 4) return;
+          const fromLeft = Math.random() < 0.5;
+          const startX = fromLeft ? -60 : W + 60;
+          const startY = Math.random() * H * 0.6;
+          const speed = 9 + Math.random() * 6;
+          shootingStars.push({
+            x: startX,
+            y: startY,
+            vx: fromLeft ? speed : -speed,
+            vy: speed * 0.4,
+            life: 0,
+            maxLife: 75,
+          });
+        }
+
+        function maybeSpawnShootingStar() {
+          if (Math.random() < CONFIG.shootingStarChance) {
+            spawnShootingStar();
+          }
+        }
+
+        function updateAndDrawShootingStars() {
+          shootingStars = shootingStars.filter((s) => s.life < s.maxLife);
+          shootingStars.forEach((s) => {
+            s.x += s.vx;
+            s.y += s.vy;
+            s.life++;
+            const lifeRatio = s.life / s.maxLife;
+            const alpha = Math.sin((1 - lifeRatio) * Math.PI);
+            const tailX = s.x - s.vx * 9;
+            const tailY = s.y - s.vy * 9;
+
+            const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
+            grad.addColorStop(0, `rgba(255,255,255,${0.95 * alpha})`);
+            grad.addColorStop(0.4, `rgba(220,225,255,${0.55 * alpha})`);
+            grad.addColorStop(1, "rgba(200,210,255,0)");
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 2.4;
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            ctx.moveTo(s.x, s.y);
+            ctx.lineTo(tailX, tailY);
+            ctx.stroke();
+
+            const headGrad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, 6);
+            headGrad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+            headGrad.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = headGrad;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, 6, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        function spawnBurst(x, y, colorRGB, count) {
+          for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+            const speed = 1.2 + Math.random() * 2.4;
+            sparkles.push({
+              x,
+              y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              life: 0,
+              maxLife: 34 + Math.random() * 18,
+              radius: 1.2 + Math.random() * 1.6,
+              color: colorRGB,
+            });
+          }
+        }
+
+        function updateAndDrawSparkles() {
+          sparkles = sparkles.filter((p) => p.life < p.maxLife);
+          sparkles.forEach((p) => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.96;
+            p.vy *= 0.96;
+            p.life++;
+            const alpha = 1 - p.life / p.maxLife;
+            ctx.beginPath();
+            ctx.fillStyle = `rgba(${p.color}, ${alpha})`;
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        function drawBackground() {
+          const sky = ctx.createLinearGradient(0, 0, 0, H);
+          sky.addColorStop(0, "#05061a");
+          sky.addColorStop(0.55, "#10123a");
+          sky.addColorStop(1, "#241854");
+          ctx.fillStyle = sky;
+          ctx.fillRect(0, 0, W, H);
+
+          const nebulae = [
+            { x: W * 0.18, y: H * 0.25, r: W * 0.32, color: "88,70,180" },
+            { x: W * 0.82, y: H * 0.55, r: W * 0.28, color: "60,50,140" },
+            { x: W * 0.5, y: H * 0.85, r: W * 0.4, color: "110,80,200" },
+          ];
+          nebulae.forEach((n) => {
+            const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r);
+            grad.addColorStop(0, `rgba(${n.color}, 0.10)`);
+            grad.addColorStop(1, `rgba(${n.color}, 0)`);
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+
+        function drawConstellationLines(linkAlpha) {
+          if (linkAlpha <= 0) return;
+          const sorted = stars.slice().sort((a, b) => a.x - b.x);
+          ctx.lineWidth = 1;
+          for (let i = 0; i < sorted.length; i++) {
+            const a = sorted[i];
+            for (
+              let j = 1;
+              j <= CONFIG.linksPerStar && i + j < sorted.length;
+              j++
+            ) {
+              const b = sorted[i + j];
+              const dx = a.x - b.x,
+                dy = a.y - b.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < CONFIG.maxLinkDistance) {
+                const flicker = 0.5 + 0.5 * Math.sin(time * 0.7 + i * 1.3);
+                const alpha =
+                  (1 - dist / CONFIG.maxLinkDistance) *
+                  linkAlpha *
+                  flicker *
+                  0.5;
+                if (alpha <= 0.01) continue;
+                ctx.strokeStyle = `rgba(185,200,255,${alpha})`;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        function drawLetterConnections(finalGlowT) {
+          if (finalGlowT <= 0) return;
+          const letterStars = stars
+            .filter((s) => s.isLetter)
+            .sort((a, b) => a.x - b.x);
+          const connectDist = Math.min(Math.max(12, letterSpacing * 1.15), 26);
+          ctx.lineWidth = 1;
+          for (let i = 0; i < letterStars.length; i++) {
+            const a = letterStars[i];
+            for (let j = i + 1; j < Math.min(letterStars.length, i + 6); j++) {
+              const b = letterStars[j];
+              const dx = a.x - b.x,
+                dy = a.y - b.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < connectDist) {
+                const alpha = (1 - dist / connectDist) * 0.4 * finalGlowT;
+                ctx.strokeStyle = `rgba(203,180,255,${alpha})`;
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        function drawFinalAura(finalGlowT) {
+          if (finalGlowT <= 0) return;
+          const letterStars = stars.filter((s) => s.isLetter);
+          if (!letterStars.length) return;
+          let minX = Infinity,
+            maxX = -Infinity,
+            minY = Infinity,
+            maxY = -Infinity;
+          letterStars.forEach((s) => {
+            minX = Math.min(minX, s.x);
+            maxX = Math.max(maxX, s.x);
+            minY = Math.min(minY, s.y);
+            maxY = Math.max(maxY, s.y);
+          });
+          const cx = (minX + maxX) / 2,
+            cy = (minY + maxY) / 2;
+          const r = Math.max(maxX - minX, maxY - minY) * 0.62;
+          const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+          grad.addColorStop(0, `rgba(203,180,255,${0.045 * finalGlowT})`);
+          grad.addColorStop(1, "rgba(203,180,255,0)");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        function findNearestStar(px, py) {
+          let nearest = null,
+            nearestDist = CONFIG.hoverRadius;
+          for (const s of stars) {
+            const dx = s.x - px,
+              dy = s.y - py;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < nearestDist) {
+              nearest = s;
+              nearestDist = dist;
+            }
+          }
+          return nearest;
+        }
+
+        function showTooltip(star) {
+          tooltip.textContent = star.message;
+          tooltip.style.left = star.x + "px";
+          tooltip.style.top = star.y + "px";
+          tooltip.classList.add("visible");
+        }
+
+        function hideTooltip() {
+          tooltip.classList.remove("visible");
+          hoveredStar = null;
+        }
+
+        function showToast(text, duration) {
+          clearTimeout(activeToastTimeout);
+          wishToast.textContent = text;
+          wishToast.classList.add("visible");
+          activeToastTimeout = setTimeout(() => {
+            wishToast.classList.remove("visible");
+          }, duration || 2000);
+        }
+
+        function tryCatchShootingStar(px, py) {
+          for (let i = 0; i < shootingStars.length; i++) {
+            const s = shootingStars[i];
+            const dx = s.x - px,
+              dy = s.y - py;
+            if (Math.sqrt(dx * dx + dy * dy) < 34) {
+              shootingStars.splice(i, 1);
+              spawnBurst(s.x, s.y, "255,240,210", 22);
+              showToast(pick(SHOOTING_MESSAGES), 2200);
+              return true;
+            }
+          }
+          return false;
+        }
+
+        function plantWishStar(px, py) {
+          const star = new Star(px, py);
+          star.isWish = true;
+          star.hue = "gold";
+          star.vx = 0;
+          star.vy = 0;
+          star.radius = 1.6 + Math.random() * 0.8;
+          star.message = pick(STAR_MESSAGES);
+          stars.push(star);
+          spawnBurst(px, py, "255,227,176", 16);
+          showToast(pick(WISH_MESSAGES), 1900);
+        }
+
+        function handleSkyInteraction(x, y, isTapAndHold) {
+          if (tryCatchShootingStar(x, y)) return;
+          const star = findNearestStar(x, y);
+          if (star) {
+            hoveredStar = star;
+            showTooltip(star);
+            spawnBurst(star.x, star.y, "238,241,255", 8);
+            if (isTapAndHold) {
+              clearTimeout(activeTooltipTimeout);
+              activeTooltipTimeout = setTimeout(hideTooltip, 3200);
+            }
+          } else {
+            plantWishStar(x, y);
+          }
+        }
+
+        window.addEventListener("mousemove", (e) => {
+          const star = findNearestStar(e.clientX, e.clientY);
+          if (star) {
+            hoveredStar = star;
+            showTooltip(star);
+            canvas.style.cursor = "pointer";
+          } else {
+            hideTooltip();
+            canvas.style.cursor = "default";
+          }
+        });
+
+        window.addEventListener("mouseleave", hideTooltip);
+
+        window.addEventListener("click", (e) => {
+          if (e.target.closest("button")) return;
+          handleSkyInteraction(e.clientX, e.clientY, false);
+        });
+
+        let touchStartX = 0,
+          touchStartY = 0,
+          touchStartTime = 0,
+          touchMoved = false;
+        const TAP_MAX_MOVE = 12; // px of finger movement still counted as a tap
+        const TAP_MAX_DURATION = 450; // ms — longer holds are treated as scrolling/dragging
+
+        window.addEventListener(
+          "touchstart",
+          (e) => {
+            if (e.target.closest("button")) return;
+            const touch = e.touches[0];
+            if (!touch) return;
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+            touchStartTime = performance.now();
+            touchMoved = false;
+          },
+          { passive: true },
+        );
+
+        window.addEventListener(
+          "touchmove",
+          (e) => {
+            const touch = e.touches[0];
+            if (!touch) return;
+            const dx = touch.clientX - touchStartX;
+            const dy = touch.clientY - touchStartY;
+            if (Math.sqrt(dx * dx + dy * dy) > TAP_MAX_MOVE) {
+              touchMoved = true;
+            }
+          },
+          { passive: true },
+        );
+
+        window.addEventListener(
+          "touchend",
+          (e) => {
+            if (e.target.closest("button")) return;
+            if (touchMoved) return; // finger was scrolling/dragging, not tapping
+            const duration = performance.now() - touchStartTime;
+            if (duration > TAP_MAX_DURATION) return; // long press, not a tap
+            handleSkyInteraction(touchStartX, touchStartY, true);
+          },
+          { passive: true },
+        );
+
+        if (wishButton) {
+          wishButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            for (let i = 0; i < 5; i++) {
+              spawnBurst(
+                Math.random() * W,
+                H * (0.25 + Math.random() * 0.5),
+                "255,240,210",
+                14,
+              );
+            }
+            spawnShootingStar();
+            showToast("Zelja poslata u univerzum ✨", 2400);
+          });
+        }
+
+        // ---------- Mini-games ----------
+        const gameOverlay = document.getElementById("gameOverlay");
+        const gameContainer = document.getElementById("gameContainer");
+        const gameClose = document.getElementById("gameClose");
+        let activeGameCleanup = null;
+        let currentGame = null;
+
+        function openGameOverlay() {
+          gameOverlay.classList.add("visible");
+          gameOverlay.setAttribute("aria-hidden", "false");
+        }
+
+        function closeGameOverlay() {
+          gameOverlay.classList.remove("visible");
+          gameOverlay.setAttribute("aria-hidden", "true");
+          if (activeGameCleanup) {
+            activeGameCleanup();
+            activeGameCleanup = null;
+          }
+          gameContainer.innerHTML = "";
+        }
+
+        function launchGame(game) {
+          if (activeGameCleanup) {
+            activeGameCleanup();
+            activeGameCleanup = null;
+          }
+          currentGame = game;
+          if (game === "memory") startMemoryGame();
+          else if (game === "catcher") startCatcherGame();
+          else if (game === "quiz") startQuizGame();
+          else if (game === "puzzle") startPuzzleGame();
+        }
+
+        gameClose.addEventListener("click", closeGameOverlay);
+        gameOverlay.addEventListener("click", (e) => {
+          if (e.target === gameOverlay) closeGameOverlay();
+        });
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && gameOverlay.classList.contains("visible")) {
+            closeGameOverlay();
+          }
+        });
+
+        document.querySelectorAll(".game-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            openGameOverlay();
+            launchGame(card.dataset.game);
+          });
+        });
+
+        function showGameResult(title, subtitle) {
+          gameContainer.innerHTML = `
+            <div class="game-result">
+              <h3>${title}</h3>
+              <p class="subtext">${subtitle}</p>
+              <button class="cta-button" id="gamePlayAgain" type="button">Igraj ponovo</button>
+              <button class="cta-button game-secondary-btn" id="gameBackToMenu" type="button">Nazad</button>
+            </div>
+          `;
+          for (let i = 0; i < 3; i++) {
+            spawnBurst(
+              Math.random() * W,
+              H * (0.2 + Math.random() * 0.5),
+              "203,180,255",
+              12,
+            );
+          }
+          gameContainer
+            .querySelector("#gamePlayAgain")
+            .addEventListener("click", () => launchGame(currentGame));
+          gameContainer
+            .querySelector("#gameBackToMenu")
+            .addEventListener("click", closeGameOverlay);
+        }
+
+        // ---- Memory match ----
+        // EDIT ME: swap these for icons that mean something to the two of you
+        const MEMORY_EMOJIS = ["🎮", "🌙", "⭐", "🎧", "🖤", "☕"];
+
+        function startMemoryGame() {
+          const emojis = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS];
+          for (let i = emojis.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [emojis[i], emojis[j]] = [emojis[j], emojis[i]];
+          }
+
+          gameContainer.innerHTML = `
+            <p class="game-title">Igra pamćenja 🧠</p>
+            <p class="game-subtitle">Pronađi sve parove.</p>
+            <div class="memory-grid" id="memoryGrid"></div>
+            <p class="game-hud" id="memoryHud">Potezi: 0</p>
+          `;
+          const grid = gameContainer.querySelector("#memoryGrid");
+          const hud = gameContainer.querySelector("#memoryHud");
+          let moves = 0,
+            matchedCount = 0,
+            lockBoard = false,
+            first = null,
+            pendingTimeout = null;
+
+          emojis.forEach((emoji, idx) => {
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className = "memory-card";
+            card.dataset.emoji = emoji;
+            card.dataset.index = idx;
+            card.textContent = "✦";
+            grid.appendChild(card);
+          });
+
+          function handleCardClick(e) {
+            const card = e.currentTarget;
+            if (
+              lockBoard ||
+              card.classList.contains("flipped") ||
+              card.classList.contains("matched")
+            )
+              return;
+            card.classList.add("flipped");
+            card.textContent = card.dataset.emoji;
+
+            if (!first) {
+              first = card;
+              return;
+            }
+
+            moves++;
+            hud.textContent = `Potezi: ${moves}`;
+
+            if (first.dataset.emoji === card.dataset.emoji && first !== card) {
+              first.classList.add("matched");
+              card.classList.add("matched");
+              matchedCount += 2;
+              first = null;
+              if (matchedCount === emojis.length) {
+                pendingTimeout = setTimeout(() => {
+                  showGameResult("GG! 🎉", `Rešila si sve u ${moves} poteza.`);
+                }, 500);
+              }
+            } else {
+              lockBoard = true;
+              const stuckFirst = first;
+              const stuckSecond = card;
+              pendingTimeout = setTimeout(() => {
+                stuckFirst.classList.remove("flipped");
+                stuckFirst.textContent = "✦";
+                stuckSecond.classList.remove("flipped");
+                stuckSecond.textContent = "✦";
+                lockBoard = false;
+              }, 750);
+              first = null;
+            }
+          }
+
+          grid
+            .querySelectorAll(".memory-card")
+            .forEach((card) => card.addEventListener("click", handleCardClick));
+
+          activeGameCleanup = () => {
+            if (pendingTimeout) clearTimeout(pendingTimeout);
+          };
+        }
+
+        // ---- Star catcher ----
+        function startCatcherGame() {
+          gameContainer.innerHTML = `
+            <p class="game-title">Catch stars ⭐</p>
+            <p class="game-subtitle">Tapni zvezde pre nego što padnu. Imaš 25 sekundi.</p>
+            <div class="catcher-stage" id="catcherStage"></div>
+            <div class="catcher-hud">
+              <span id="catcherScore">Poeni: 0</span>
+              <span id="catcherTime">Vreme: 25s</span>
+            </div>
+          `;
+          const stage = gameContainer.querySelector("#catcherStage");
+          const scoreEl = gameContainer.querySelector("#catcherScore");
+          const timeEl = gameContainer.querySelector("#catcherTime");
+
+          let score = 0,
+            timeLeft = 25,
+            spawnTimer = null,
+            tickTimer = null,
+            ended = false;
+          const starGlyphs = ["⭐", "✨", "🌟"];
+
+          function spawnStar() {
+            if (ended) return;
+            const stageRect = stage.getBoundingClientRect();
+            const el = document.createElement("span");
+            el.className = "catcher-star";
+            el.textContent =
+              starGlyphs[Math.floor(Math.random() * starGlyphs.length)];
+            const startX = Math.max(0, Math.random() * (stageRect.width - 32));
+            el.style.left = startX + "px";
+            el.style.top = "-32px";
+            stage.appendChild(el);
+
+            const duration = 2200 + Math.random() * 1400;
+            const fallDistance = stageRect.height + 60;
+            let startTime = null;
+
+            function fall(ts) {
+              if (ended || !el.isConnected) return;
+              if (!startTime) startTime = ts;
+              const progress = (ts - startTime) / duration;
+              if (progress >= 1) {
+                el.remove();
+                return;
+              }
+              el.style.top = -32 + progress * fallDistance + "px";
+              requestAnimationFrame(fall);
+            }
+            requestAnimationFrame(fall);
+
+            el.addEventListener("click", () => {
+              if (ended) return;
+              score++;
+              scoreEl.textContent = `Poeni: ${score}`;
+              el.remove();
+            });
+
+            if (!ended) {
+              spawnTimer = setTimeout(spawnStar, 550 + Math.random() * 350);
+            }
+          }
+
+          function endCatcher() {
+            if (ended) return;
+            ended = true;
+            clearTimeout(spawnTimer);
+            clearInterval(tickTimer);
+            stage.querySelectorAll(".catcher-star").forEach((s) => s.remove());
+            let msg;
+            if (score >= 18) msg = "Nezaustavljiva! 🌠";
+            else if (score >= 10) msg = "Odlično ulovljeno! ⭐";
+            else msg = "Lepo pokušano — probaj ponovo! ✨";
+            setTimeout(() => showGameResult(`Poeni: ${score}`, msg), 300);
+          }
+
+          spawnStar();
+          tickTimer = setInterval(() => {
+            timeLeft--;
+            timeEl.textContent = `Vreme: ${timeLeft}s`;
+            if (timeLeft <= 0) endCatcher();
+          }, 1000);
+
+          activeGameCleanup = () => {
+            ended = true;
+            clearTimeout(spawnTimer);
+            clearInterval(tickTimer);
+          };
+        }
+
+        // ---- Quiz ----
+        // EDIT ME: personalize these questions, options, and correct answers
+        const QUIZ_QUESTIONS = [
+          {
+            q: "Kada smo prvi put pričali?",
+            options: [
+              "U februaru",
+              "Na nečijem rođendanu",
+              "Slučajno",
+              "Ne sećam se, a trebalo bi",
+            ],
+            correct: 0,
+          },
+          {
+            q: "Šta najčešće radimo kasno uveče?",
+            options: [
+              "Igramo igrice",
+              "Pričamo gluposti",
+              "Oboje",
+              "Spavamo (retko)",
+            ],
+            correct: 2,
+          },
+          {
+            q: "Koja je moja omiljena fora da te nasmejem?",
+            options: [
+              "Loši vicevi",
+              "Glasovi",
+              "Ozbiljno lice pa iznenadna glupost",
+              "Sve gore navedeno",
+            ],
+            correct: 3,
+          },
+        ];
+
+        function startQuizGame() {
+          let index = 0,
+            score = 0,
+            pendingTimeout = null;
+
+          renderQuestion();
+
+          function renderQuestion() {
+            const item = QUIZ_QUESTIONS[index];
+            gameContainer.innerHTML = `
+              <p class="game-title">Koliko me poznaješ? 💜</p>
+              <p class="quiz-progress">Pitanje ${index + 1} od ${QUIZ_QUESTIONS.length}</p>
+              <p class="quiz-question">${item.q}</p>
+              <div class="quiz-options" id="quizOptions"></div>
+            `;
+            const optionsEl = gameContainer.querySelector("#quizOptions");
+            item.options.forEach((opt, i) => {
+              const btn = document.createElement("button");
+              btn.type = "button";
+              btn.className = "quiz-option";
+              btn.textContent = opt;
+              btn.addEventListener("click", () => {
+                if (btn.disabled) return;
+                optionsEl
+                  .querySelectorAll(".quiz-option")
+                  .forEach((o) => (o.disabled = true));
+                if (i === item.correct) {
+                  btn.classList.add("correct");
+                  score++;
+                } else {
+                  btn.classList.add("wrong");
+                  optionsEl.children[item.correct].classList.add("correct");
+                }
+                pendingTimeout = setTimeout(() => {
+                  index++;
+                  if (index < QUIZ_QUESTIONS.length) {
+                    renderQuestion();
+                  } else {
+                    const pct = Math.round(
+                      (score / QUIZ_QUESTIONS.length) * 100,
+                    );
+                    let msg;
+                    if (pct === 100) msg = "Znaš me bolje nego što mislim. 🖤";
+                    else if (pct >= 60)
+                      msg = "Solidno! Imamo o čemu da pričamo. 😄";
+                    else msg = "Hajde, moramo više da pričamo. 😉";
+                    showGameResult(`${score}/${QUIZ_QUESTIONS.length}`, msg);
+                  }
+                }, 900);
+              });
+              optionsEl.appendChild(btn);
+            });
+          }
+
+          activeGameCleanup = () => {
+            if (pendingTimeout) clearTimeout(pendingTimeout);
+          };
+        }
+
+        // ---- Photo puzzle ----
+        // EDIT ME: path to your photo (place the file at assets/image.png
+        // next to this HTML file), and the grid size (3 = 3x3 = 9 pieces;
+        // 2 is easier, 4 is harder).
+        const PUZZLE_IMAGE = "assets/image.jpg";
+        const PUZZLE_GRID = 3;
+
+        function startPuzzleGame() {
+          gameContainer.innerHTML = `
+            <p class="game-title">Puzla 🧩</p>
+            <p class="game-subtitle">Učitavam sliku...</p>
+          `;
+
+          const testImg = new Image();
+          testImg.onload = renderPuzzle;
+          testImg.onerror = () => {
+            gameContainer.innerHTML = `
+              <p class="game-title">Puzla 🧩</p>
+              <div class="puzzle-missing">
+                <p class="game-subtitle">Nisam mogla da pronađem sliku. Dodaj fajl na:</p>
+                <code>${PUZZLE_IMAGE}</code>
+                <p class="game-subtitle" style="margin-top:.8rem;">(fascikla "assets" pored ove HTML stranice)</p>
+                <button class="cta-button game-secondary-btn" id="puzzleBackToMenu" type="button">Nazad na igre</button>
+              </div>
+            `;
+            gameContainer
+              .querySelector("#puzzleBackToMenu")
+              .addEventListener("click", closeGameOverlay);
+          };
+          testImg.src = PUZZLE_IMAGE;
+
+          function renderPuzzle() {
+            gameContainer.innerHTML = `
+              <p class="game-title">Puzla 🧩</p>
+              <p class="game-subtitle">Tapni dva dela da ih zameniš mesta, dok slika ne bude cela.</p>
+              <div class="puzzle-wrap">
+                <p class="puzzle-preview-label">pregled</p>
+                <img class="puzzle-preview" src="${PUZZLE_IMAGE}" alt="pregled slike" />
+                <div class="puzzle-board" id="puzzleBoard" style="--puzzle-grid:${PUZZLE_GRID}"></div>
+              </div>
+            `;
+
+            const board = gameContainer.querySelector("#puzzleBoard");
+            const total = PUZZLE_GRID * PUZZLE_GRID;
+
+            function isSolved(arr) {
+              return arr.every((v, i) => v === i);
+            }
+
+            let order = Array.from({ length: total }, (_, i) => i);
+            do {
+              for (let i = order.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [order[i], order[j]] = [order[j], order[i]];
+              }
+            } while (isSolved(order));
+
+            let selectedCell = null;
+            let solved = false;
+
+            function render() {
+              board.innerHTML = "";
+              order.forEach((pieceIndex, cellIndex) => {
+                const row = Math.floor(pieceIndex / PUZZLE_GRID);
+                const col = pieceIndex % PUZZLE_GRID;
+                const tile = document.createElement("button");
+                tile.type = "button";
+                tile.className = "puzzle-tile";
+                tile.dataset.cell = cellIndex;
+                tile.style.backgroundImage = `url('${PUZZLE_IMAGE}')`;
+                tile.style.backgroundSize = `${PUZZLE_GRID * 100}% ${PUZZLE_GRID * 100}%`;
+                const denom = PUZZLE_GRID - 1 || 1;
+                tile.style.backgroundPosition = `${(col / denom) * 100}% ${(row / denom) * 100}%`;
+                tile.addEventListener("click", () =>
+                  handleTileClick(cellIndex, tile),
+                );
+                board.appendChild(tile);
+              });
+            }
+
+            function handleTileClick(cellIndex, tileEl) {
+              if (solved) return;
+              if (selectedCell === null) {
+                selectedCell = cellIndex;
+                tileEl.classList.add("selected");
+                return;
+              }
+              if (selectedCell === cellIndex) {
+                tileEl.classList.remove("selected");
+                selectedCell = null;
+                return;
+              }
+              [order[selectedCell], order[cellIndex]] = [
+                order[cellIndex],
+                order[selectedCell],
+              ];
+              selectedCell = null;
+              render();
+              if (isSolved(order)) {
+                solved = true;
+                setTimeout(() => {
+                  showGameResult("Uspela si! 🧩🖤", "dzidarica");
+                }, 700);
+              }
+            }
+
+            render();
+
+            activeGameCleanup = () => {};
+          }
+        }
+
+        function animate(now) {
+          const dt = Math.min(0.05, (now - lastFrame) / 1000);
+          lastFrame = now;
+          time += dt;
+
+          const linkAlpha =
+            clamp(
+              (scrollProgress - PHASE_BOUNDS.linksStart) /
+                (PHASE_BOUNDS.linksPeakEnd - PHASE_BOUNDS.linksStart),
+              0,
+              1,
+            ) * clamp(1 - (scrollProgress - PHASE_BOUNDS.lerpEnd) / 0.15, 0, 1);
+          const letterT = clamp(
+            (scrollProgress - PHASE_BOUNDS.lerpStart) /
+              (PHASE_BOUNDS.lerpEnd - PHASE_BOUNDS.lerpStart),
+            0,
+            1,
+          );
+          const finalGlowT = clamp(
+            (scrollProgress - PHASE_BOUNDS.finalGlowStart) /
+              (1 - PHASE_BOUNDS.finalGlowStart),
+            0,
+            1,
+          );
+
+          ctx.clearRect(0, 0, W, H);
+          drawBackground();
+
+          drawConstellationLines(linkAlpha);
+          drawLetterConnections(finalGlowT);
+          drawFinalAura(finalGlowT);
+
+          stars.forEach((s) => {
+            s.update(letterT);
+            s.draw(finalGlowT);
+          });
+
+          if (hoveredStar) {
+            tooltip.style.left = hoveredStar.x + "px";
+            tooltip.style.top = hoveredStar.y + "px";
+          }
+
+          maybeSpawnShootingStar();
+          updateAndDrawShootingStars();
+          updateAndDrawSparkles();
+
+          requestAnimationFrame(animate);
+        }
+
+        init();
+        computeScrollProgress();
+        requestAnimationFrame(animate);
+        setTimeout(spawnShootingStar, 900);
+        setTimeout(spawnShootingStar, 2600);
+      })();
+    </script>
+  </body>
+</html>
