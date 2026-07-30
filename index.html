@@ -434,6 +434,8 @@
         cursor: pointer;
         user-select: none;
         color: var(--text-soft);
+        overflow: hidden;
+        padding: 0;
         transition:
           transform 0.2s ease,
           background 0.3s ease;
@@ -446,6 +448,14 @@
         background: rgba(203, 180, 255, 0.12);
         opacity: 0.5;
         cursor: default;
+      }
+      .memory-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 10px;
+        display: block;
+        pointer-events: none;
       }
       .game-hud {
         margin-top: 0.9rem;
@@ -755,7 +765,7 @@
         };
 
         const STAR_MESSAGES = [
-          "Svaki put kad mi se javiš, ulepšaš mi veče",
+          // "Svaki put kad mi se javiš, ulepšaš mi veče",
           "Ova zvezda pamti da mi nisi nikad rekla kako se zove pesma 'vrati se meni vrati'",
           "Ova zvezda pamti svaki game koji si iztrollala",
           "Ova zvezda pamti svaki poziv ujutru pre prakse i posla",
@@ -766,12 +776,8 @@
           "Ova zvezda pamti nas prvi susret",
           "Ova zvezda pamti svaki put kad si mi rekla da sam bebica",
           "Ova zvezda pamti svaki put kad si mi rekla da ces da me prebijes",
-          "Ova zvezda pamti nas prvi odgledan film (Obssesion)",
+          "Ova zvezda pamti nas prvi odgledan film",
           "Ova zvezda pamti 30.01.2026.",
-          "Još nisam preboleo onu partiju koju smo skoro dobili",
-          "Način na koji 'vraćam se za 5 min' uvek postane 2 sata",
-          "Ona poruka koja mi je izmamila osmeh za ceo dan",
-          "Nekako obične dane pretvaraš u posebne planove",
         ];
 
         const WISH_MESSAGES = [
@@ -946,17 +952,9 @@
           const glyphFont = (size) =>
             `900 ${size}px 'Poppins', 'Arial Black', sans-serif`;
 
-          // Available box for the message. On narrow/mobile screens this
-          // lets the text wrap into more (shorter) lines instead of being
-          // squeezed into a fixed 2-line layout, so the font can stay big.
           const maxLineWidth = width * 0.9;
           const maxBlockHeight = height * 0.62;
 
-          // We space words manually (rather than relying on the font's own
-          // space glyph) so gaps stay wide and consistent even once the
-          // text gets turned into a sparse cloud of star points — a thin
-          // native space collapses at low sample density and words read as
-          // one blended blob.
           const wordGapFor = (size) => size * 0.62;
 
           function lineWidthWithGap(lineWords, size) {
@@ -1001,8 +999,6 @@
             };
           }
 
-          // Start from a generous size relative to the smaller screen
-          // dimension, then shrink only as much as needed to fit.
           let fontSize = Math.floor(Math.min(width, height) / 4);
           let fitResult = fitsAt(fontSize);
           while (!fitResult.ok && fontSize > 10) {
@@ -1478,8 +1474,8 @@
           touchStartY = 0,
           touchStartTime = 0,
           touchMoved = false;
-        const TAP_MAX_MOVE = 12; // px of finger movement still counted as a tap
-        const TAP_MAX_DURATION = 450; // ms — longer holds are treated as scrolling/dragging
+        const TAP_MAX_MOVE = 12;
+        const TAP_MAX_DURATION = 450;
 
         window.addEventListener(
           "touchstart",
@@ -1513,9 +1509,9 @@
           "touchend",
           (e) => {
             if (e.target.closest("button")) return;
-            if (touchMoved) return; // finger was scrolling/dragging, not tapping
+            if (touchMoved) return;
             const duration = performance.now() - touchStartTime;
-            if (duration > TAP_MAX_DURATION) return; // long press, not a tap
+            if (duration > TAP_MAX_DURATION) return;
             handleSkyInteraction(touchStartX, touchStartY, true);
           },
           { passive: true },
@@ -1614,14 +1610,22 @@
         }
 
         // ---- Memory match ----
-        // EDIT ME: swap these for icons that mean something to the two of you
-        const MEMORY_EMOJIS = ["🎮", "🌙", "⭐", "🎧", "🖤", "☕"];
+        // EDIT ME: her face stickers — expects files at
+        // assets/stickers/1-sticker.png ... 6-sticker.png next to this HTML.
+        // Change STICKER_EXT below if your files use a different extension
+        // (e.g. "jpg" or "webp").
+        const STICKER_COUNT = 6;
+        const STICKER_EXT = "png";
+        const MEMORY_STICKERS = Array.from(
+          { length: STICKER_COUNT },
+          (_, i) => `assets/stickers/${i + 1}-sticker.${STICKER_EXT}`,
+        );
 
         function startMemoryGame() {
-          const emojis = [...MEMORY_EMOJIS, ...MEMORY_EMOJIS];
-          for (let i = emojis.length - 1; i > 0; i--) {
+          const stickers = [...MEMORY_STICKERS, ...MEMORY_STICKERS];
+          for (let i = stickers.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [emojis[i], emojis[j]] = [emojis[j], emojis[i]];
+            [stickers[i], stickers[j]] = [stickers[j], stickers[i]];
           }
 
           gameContainer.innerHTML = `
@@ -1638,15 +1642,32 @@
             first = null,
             pendingTimeout = null;
 
-          emojis.forEach((emoji, idx) => {
+          stickers.forEach((stickerSrc, idx) => {
             const card = document.createElement("button");
             card.type = "button";
             card.className = "memory-card";
-            card.dataset.emoji = emoji;
+            card.dataset.sticker = stickerSrc;
             card.dataset.index = idx;
-            card.textContent = "✦";
+            card.textContent = "✦"; // face-down state
             grid.appendChild(card);
           });
+
+          function showFace(card) {
+            card.textContent = "";
+            const img = document.createElement("img");
+            img.src = card.dataset.sticker;
+            img.alt = "";
+            // if a sticker file is missing, fall back to a plain symbol
+            // instead of a broken-image icon
+            img.onerror = () => {
+              card.textContent = "🖤";
+            };
+            card.appendChild(img);
+          }
+
+          function showBack(card) {
+            card.textContent = "✦";
+          }
 
           function handleCardClick(e) {
             const card = e.currentTarget;
@@ -1657,7 +1678,7 @@
             )
               return;
             card.classList.add("flipped");
-            card.textContent = card.dataset.emoji;
+            showFace(card);
 
             if (!first) {
               first = card;
@@ -1667,12 +1688,15 @@
             moves++;
             hud.textContent = `Potezi: ${moves}`;
 
-            if (first.dataset.emoji === card.dataset.emoji && first !== card) {
+            if (
+              first.dataset.sticker === card.dataset.sticker &&
+              first !== card
+            ) {
               first.classList.add("matched");
               card.classList.add("matched");
               matchedCount += 2;
               first = null;
-              if (matchedCount === emojis.length) {
+              if (matchedCount === stickers.length) {
                 pendingTimeout = setTimeout(() => {
                   showGameResult("GG! 🎉", `Rešila si sve u ${moves} poteza.`);
                 }, 500);
@@ -1683,9 +1707,9 @@
               const stuckSecond = card;
               pendingTimeout = setTimeout(() => {
                 stuckFirst.classList.remove("flipped");
-                stuckFirst.textContent = "✦";
+                showBack(stuckFirst);
                 stuckSecond.classList.remove("flipped");
-                stuckSecond.textContent = "✦";
+                showBack(stuckSecond);
                 lockBoard = false;
               }, 750);
               first = null;
