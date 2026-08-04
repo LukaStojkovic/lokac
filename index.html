@@ -409,6 +409,38 @@
       .game-overlay.visible .game-panel {
         transform: translateY(0) scale(1);
       }
+
+      .lock-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.2rem;
+      }
+
+      .lock-icon {
+        font-size: 4rem;
+        filter: drop-shadow(0 0 18px rgba(203, 180, 255, 0.5));
+        animation: lockFloat 2.5s ease-in-out infinite;
+        transition:
+          transform 0.5s ease,
+          opacity 0.5s ease;
+      }
+
+      @keyframes lockFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      /* unlocked animation */
+      .phase-cake.unlocked .lock-icon {
+        transform: scale(0) rotate(30deg);
+        opacity: 0;
+      }
       .game-close {
         position: absolute;
         top: 12px;
@@ -901,8 +933,7 @@
           <p class="eyebrow">negde između februara i sada</p>
           <!-- EDIT ME: mid-scroll line -->
           <h1 class="headline">
-            Svaka kasna noć, svaka glupa šala, svako "još jedna igra" — sve je
-            još uvek ovde.
+            Svaka kasna noć, svaki poziv, svaka poruka — sve je još uvek ovde.
           </h1>
           <p class="subtext">Pređi preko zvezde. Reći će ti nešto.</p>
         </div>
@@ -977,13 +1008,17 @@
         <div class="phase-inner cake-inner">
           <div class="cake-locked" id="cakeLocked">
             <p class="eyebrow">iznenađenje</p>
+
             <!-- <h1 class="headline">Negde se krije torta…</h1> -->
             <p class="subtext">Odigraj sve četiri mini igre da je otključaš.</p>
+            <div class="lock-container">
+              <div class="lock-icon">🔒</div>
+            </div>
             <p class="cake-progress" id="cakeProgress">0 / 4 igre odigrane</p>
           </div>
 
           <div class="cake-unlocked" id="cakeUnlocked">
-            <p class="eyebrow">19. rođendan</p>
+            <!-- <p class="eyebrow">19. rođendan</p> -->
             <!-- <h1 class="headline">Zamisli želju i dunimo svećice</h1> -->
             <p class="subtext" id="cakeInstructions">
               Zatvori oči na sekund, zamisli želju, pa tapni svaku svećicu da je
@@ -1011,7 +1046,8 @@
             <div class="cake-celebration" id="cakeCelebration">
               <p class="final-note">Srećan 19. rođendan, Lola! 🎉🖤</p>
               <p class="subtext">
-                Neka ova godina bude puna malih trenutaka, baš kao ovi.
+                Zelim ti puno srece, da ostvaris sve sto zelis i da te u zivotu
+                prate ljudi koji ce umeti da te vole na nacin koji zasluzujes.
               </p>
               <button class="cta-button" id="wishButton" type="button">
                 Zamisli želju 🖤
