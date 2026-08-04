@@ -8,6 +8,7 @@
     />
     <title>Za Lolu — Mali Univerzum</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="icon" type="image/png" href="/assets/icon.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Quicksand:wght@300;400;500;600&family=Poppins:wght@800;900&display=swap"
       rel="stylesheet"
@@ -657,12 +658,14 @@
     <main>
       <section class="phase phase-1" data-phase="1">
         <div class="phase-inner">
-          <p class="eyebrow">mali univerzum, za tebe</p>
+          <p class="eyebrow">mali univerzum</p>
 
-          <h1 class="headline">Dobrodošla u moj mali univerzum za tebe…</h1>
+          <h1 class="headline">Dobrodošla u mali univerzum za tebe…</h1>
 
           <p class="subtext">
-            Svaka zvezda ovde pamti nešto. Nastavi da skroluješ.
+            Nismo imali priliku da napravimo mnogo velikih uspomena, ali smo
+            imali dosta malih trenutaka koji su mi značili. Zato sam napravio
+            ovo mesto gde mogu da ih sačuvam.
           </p>
 
           <div class="scroll-cue">skroluj ↓</div>
@@ -683,9 +686,11 @@
 
       <section class="phase phase-3" data-phase="3">
         <div class="phase-inner">
-          <p class="eyebrow">pažljivo gledaj</p>
+          <p class="eyebrow">Mali trenuci pronašli su svoje mesto.</p>
           <!-- EDIT ME: transition line -->
-          <h1 class="headline">Više ne lutaju. One ispisuju nešto.</h1>
+          <h1 class="headline">
+            Sačuvani među zvezdama, baš onako kako ih pamtim.
+          </h1>
         </div>
       </section>
 
@@ -695,7 +700,10 @@
           <!-- EDIT ME: closing note -->
           <p class="final-note">
             Srećan rođendan, Lola.<br />
-            Za sve galaksije koje još nismo istražili.
+            <span class="subtext"
+              >Nadam se da će ti ovaj mali univerzum izmamiti osmeh, kao što si
+              ti meni mnogo puta.</span
+            >
           </p>
 
           <button class="cta-button" id="wishButton" type="button">
@@ -787,6 +795,16 @@
         lerpEnd: 0.8,
         finalGlowStart: 0.8,
       };
+
+      // Stars no longer sit at full brightness the moment the page loads —
+      // each one has its own little "reveal window" inside the early part of
+      // the scroll, and the whole field keeps deepening/brightening a bit
+      // further as you keep scrolling, so the sky feels like it's being
+      // uncovered rather than dumped on screen all at once.
+      const APPEAR_SCROLL_END = 0.1; // by this scroll progress, every star has appeared
+      const APPEAR_FADE_WIDTH = 0.22; // how long (in scroll progress) each star takes to fade in
+      const SHINE_MIN = 0.1; // overall dimness at the very top of the page
+      const SHINE_SCROLL_RANGE = 0.6; // scroll progress over which brightness ramps up to full
 
       // Slow left/right drift applied only to the deep star layer (not the
       // background gradient, not shooting stars) — gives a parallax "3D
@@ -933,84 +951,6 @@
         return tex;
       }
       const softCircleTexture = generateSoftCircleTexture(256);
-
-      /* ---------- Sima the space dog (floating background companion) ---------- */
-      // EDIT ME: place the image at assets/sima.png next to this HTML file
-      let simaLoaded = false;
-      let simaAspect = 410 / 348; // fallback ratio until the real image loads
-      let simaHovered = false;
-      let simaBounceStart = null;
-
-      const simaMaterial = new THREE.SpriteMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-        opacity: 0,
-      });
-      const simaSprite = new THREE.Sprite(simaMaterial);
-      simaSprite.renderOrder = 3;
-      simaSprite.frustumCulled = false;
-      simaSprite.visible = false;
-      scene.add(simaSprite);
-
-      new THREE.TextureLoader().load(
-        "assets/sima.png",
-        (texture) => {
-          if (THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
-          simaMaterial.map = texture;
-          simaMaterial.needsUpdate = true;
-          if (texture.image && texture.image.width && texture.image.height) {
-            simaAspect = texture.image.width / texture.image.height;
-          }
-          simaLoaded = true;
-          simaSprite.visible = true;
-        },
-        undefined,
-        () => {
-          console.warn("Sima image not found — expected at assets/sima.png");
-        },
-      );
-
-      function simaContainsPoint(px, py) {
-        if (!simaLoaded) return false;
-        const halfW = simaSprite.scale.x / 2;
-        const halfH = simaSprite.scale.y / 2;
-        return (
-          Math.abs(px - simaSprite.position.x) <= halfW &&
-          Math.abs(py - simaSprite.position.y) <= halfH
-        );
-      }
-
-      function simaTooltipPos() {
-        return {
-          x: simaSprite.position.x,
-          y: simaSprite.position.y - simaSprite.scale.y / 2 - 8,
-        };
-      }
-
-      function updateSima() {
-        if (!simaLoaded) return;
-        // gentle wandering flight path — independent of the star-field pan,
-        // so it reads as its own nearby, "alive" layer
-        const driftX =
-          W * 0.72 + Math.sin(time * 0.09) * Math.min(W * 0.16, 130);
-        const driftY = H * 0.3 + Math.cos(time * 0.13) * Math.min(H * 0.12, 70);
-        simaSprite.position.set(driftX, driftY, 0.15);
-        simaMaterial.rotation = Math.sin(time * 0.5) * 0.06;
-        simaMaterial.opacity = 1;
-
-        let bounce = 0;
-        if (simaBounceStart !== null) {
-          const bt = (time - simaBounceStart) / 0.5;
-          if (bt >= 1) {
-            simaBounceStart = null;
-          } else {
-            bounce = Math.sin(bt * Math.PI) * 0.18;
-          }
-        }
-        const targetWidth = clamp(W * 0.22, 90, 170) * (1 + bounce);
-        simaSprite.scale.set(targetWidth, targetWidth / simaAspect, 1);
-      }
 
       /* ---------- background (sky gradient + nebulae + galaxy band + dust) ---------- */
       const bgMaterial = new THREE.ShaderMaterial({
@@ -1672,6 +1612,10 @@
           this.message =
             STAR_MESSAGES[Math.floor(Math.random() * STAR_MESSAGES.length)];
           this.hue = Math.random() < 0.7 ? "pale" : "blue";
+          // Each star gets its own point along the scroll where it begins
+          // to fade in, so the field reveals itself gradually rather than
+          // popping in all at once on load.
+          this.appearThreshold = Math.random();
         }
       }
 
@@ -1826,6 +1770,9 @@
         star.vy = 0;
         star.radius = 1.6 + Math.random() * 0.8;
         star.message = pick(STAR_MESSAGES);
+        // planted by a direct tap/click, so it should shine right away
+        // instead of waiting on the scroll-driven reveal window
+        star.appearThreshold = 0;
         starList.push(star);
         starsGeo._writeStaticStarAttrs(activeStarCount, star);
         activeStarCount++;
@@ -1849,6 +1796,17 @@
         currentLetterT = letterT;
         const pos = starsGeo.attributes.position.array;
         const alp = starsGeo.attributes.aAlpha.array;
+
+        // Global "sky brightening" factor: the whole field starts a bit
+        // dim/muted at the very top of the page and deepens into its full
+        // brightness as the person keeps scrolling — reinforces the sense
+        // that scrolling is what's revealing the universe.
+        const shineBoost = lerp(
+          SHINE_MIN,
+          1,
+          clamp(scrollProgress / SHINE_SCROLL_RANGE, 0, 1),
+        );
+
         for (let i = 0; i < starList.length; i++) {
           const s = starList[i];
           if (!s.isWish) {
@@ -1881,10 +1839,26 @@
             ? 0.85 + 0.15 * Math.sin(time * 1.6 + s.twinkleSeed)
             : 1;
 
+          // Staggered scroll-driven reveal: each star fades in over its own
+          // window inside the early part of the scroll, instead of every
+          // star being fully visible the instant the page loads.
+          let appearAlpha = 1;
+          if (!s.isWish) {
+            const windowStart =
+              s.appearThreshold * (APPEAR_SCROLL_END - APPEAR_FADE_WIDTH);
+            const windowEnd = windowStart + APPEAR_FADE_WIDTH;
+            const rawAppear = clamp(
+              (scrollProgress - windowStart) / (windowEnd - windowStart),
+              0,
+              1,
+            );
+            appearAlpha = easeInOutCubic(rawAppear);
+          }
+
           pos[i * 3] = starDrawX(s);
           pos[i * 3 + 1] = s.y;
           pos[i * 3 + 2] = 0;
-          alp[i] = b * wishPulse;
+          alp[i] = b * wishPulse * appearAlpha * shineBoost;
         }
         starsGeo.attributes.position.needsUpdate = true;
         starsGeo.attributes.aAlpha.needsUpdate = true;
@@ -2154,7 +2128,6 @@
       function hideTooltip() {
         tooltip.classList.remove("visible");
         hoveredStar = null;
-        simaHovered = false;
       }
 
       function showToast(text, duration) {
@@ -2169,27 +2142,6 @@
       function handleSkyInteraction(x, y, isTapAndHold) {
         // shooting stars fly in raw screen space (unaffected by the star-field pan)
         if (tryCatchShootingStar(x, y)) return;
-        if (simaContainsPoint(x, y)) {
-          simaHovered = true;
-          hoveredStar = null;
-          const p = simaTooltipPos();
-          tooltip.textContent = "sima";
-          tooltip.style.left = p.x + "px";
-          tooltip.style.top = p.y + "px";
-          tooltip.classList.add("visible");
-          spawnBurst(
-            simaSprite.position.x,
-            simaSprite.position.y,
-            "255,227,176",
-            14,
-          );
-          simaBounceStart = time;
-          if (isTapAndHold) {
-            clearTimeout(activeTooltipTimeout);
-            activeTooltipTimeout = setTimeout(hideTooltip, 3200);
-          }
-          return;
-        }
         // hit-testing already compares against each star's real drawn position
         const star = findNearestStar(x, y);
         if (star) {
@@ -2208,18 +2160,6 @@
       }
 
       window.addEventListener("mousemove", (e) => {
-        if (simaContainsPoint(e.clientX, e.clientY)) {
-          simaHovered = true;
-          hoveredStar = null;
-          const p = simaTooltipPos();
-          tooltip.textContent = "sima";
-          tooltip.style.left = p.x + "px";
-          tooltip.style.top = p.y + "px";
-          tooltip.classList.add("visible");
-          renderer.domElement.style.cursor = "pointer";
-          return;
-        }
-        simaHovered = false;
         const star = findNearestStar(e.clientX, e.clientY);
         if (star) {
           hoveredStar = star;
