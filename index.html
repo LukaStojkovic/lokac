@@ -304,8 +304,16 @@
         min-height: 100vh;
         padding-bottom: 14vh;
       }
-      .games-inner {
+      .games-inner,
+      .cake-inner {
         max-width: 480px;
+        background: rgba(5, 6, 26, 0.55);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(203, 180, 255, 0.18);
+        border-radius: 28px;
+        padding: 2.2rem 1.6rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
       }
       .game-picker {
         display: flex;
@@ -647,6 +655,222 @@
         background: rgba(255, 255, 255, 0.08);
         font-size: 0.78rem;
       }
+
+      /* ---------- Birthday cake ---------- */
+      .cake-inner {
+        max-width: 520px;
+      }
+      .cake-locked {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cake-progress {
+        margin-top: 1.4rem;
+        font-family: var(--body-font);
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        padding: 0.5rem 1.1rem;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .cake-unlocked {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        pointer-events: auto;
+      }
+      .phase-cake.unlocked .cake-locked {
+        display: none;
+      }
+      .phase-cake.unlocked .cake-unlocked {
+        display: flex;
+      }
+
+      .cake-scene {
+        position: relative;
+        width: 100%;
+        max-width: 340px;
+        margin: 2rem auto 0.6rem;
+      }
+      .candle-row {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px 4px;
+        padding: 0 6px;
+        min-height: 64px;
+        align-items: flex-end;
+      }
+      .candle {
+        position: relative;
+        width: 6px;
+        height: 34px;
+        border-radius: 2px;
+        background: linear-gradient(180deg, #fff2df, #e7c98f);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        flex-shrink: 0;
+        pointer-events: auto;
+      }
+      .candle-flame {
+        position: absolute;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 16px;
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        background: radial-gradient(
+          circle at 50% 70%,
+          #fff6d8 0%,
+          var(--accent-gold) 45%,
+          rgba(255, 150, 90, 0.9) 80%,
+          rgba(255, 100, 60, 0) 100%
+        );
+        filter: drop-shadow(0 0 6px rgba(255, 210, 140, 0.85));
+        animation: flameFlicker 1.6s ease-in-out infinite;
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
+        pointer-events: none;
+      }
+      @keyframes flameFlicker {
+        0%,
+        100% {
+          transform: translateX(-50%) scale(1) rotate(-1deg);
+        }
+        30% {
+          transform: translateX(-50%) scale(1.06, 0.94) rotate(2deg);
+        }
+        60% {
+          transform: translateX(-45%) scale(0.94, 1.05) rotate(-2deg);
+        }
+      }
+      .candle.blown .candle-flame {
+        opacity: 0;
+        transform: translateX(-50%) translateY(6px) scale(0.4);
+        animation: none;
+      }
+      .candle-smoke {
+        position: absolute;
+        left: 50%;
+        bottom: 100%;
+        transform: translateX(-50%);
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(220, 220, 230, 0.6);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .candle.blown .candle-smoke {
+        animation: smokeRise 0.9s ease-out forwards;
+      }
+      @keyframes smokeRise {
+        0% {
+          opacity: 0.6;
+          transform: translate(-50%, 0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -22px) scale(3.2);
+        }
+      }
+
+      .cake-body {
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cake-tier {
+        width: 78%;
+        border-radius: 14px;
+        background: linear-gradient(
+          180deg,
+          #f4e3ff 0%,
+          var(--accent-glow) 100%
+        );
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow:
+          inset 0 -10px 18px rgba(90, 50, 140, 0.25),
+          0 10px 24px rgba(0, 0, 0, 0.3);
+        position: relative;
+      }
+      .cake-tier::before {
+        content: "";
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        right: 6px;
+        height: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.55);
+      }
+      .cake-tier-top {
+        height: 46px;
+        margin-bottom: -4px;
+        z-index: 2;
+      }
+      .cake-tier-bottom {
+        width: 100%;
+        height: 62px;
+        background: linear-gradient(
+          180deg,
+          #ffe9c6 0%,
+          var(--accent-gold) 100%
+        );
+        z-index: 1;
+      }
+      .cake-plate {
+        width: 92%;
+        height: 10px;
+        border-radius: 50%;
+        background: rgba(238, 241, 255, 0.18);
+        box-shadow: 0 6px 18px rgba(203, 180, 255, 0.2);
+        margin-top: 2px;
+      }
+
+      .cake-counter {
+        margin-top: 1.1rem;
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: var(--text-soft);
+      }
+
+      #blowAllButton {
+        margin-top: 1rem;
+      }
+
+      .cake-celebration {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 1.6rem;
+        animation: resultImageReveal 0.7s ease both;
+      }
+      .cake-unlocked.all-blown .cake-scene,
+      .cake-unlocked.all-blown .cake-counter,
+      .cake-unlocked.all-blown #blowAllButton,
+      .cake-unlocked.all-blown #cakeInstructions {
+        display: none;
+      }
+      .cake-unlocked.all-blown .cake-celebration {
+        display: flex;
+      }
+      .cake-celebration .cta-button {
+        margin-top: 0.4rem;
+      }
+      .cake-celebration .cta-button + .cta-button {
+        margin-top: 0.7rem;
+      }
     </style>
   </head>
   <body>
@@ -705,10 +929,6 @@
               ti meni mnogo puta.</span
             >
           </p>
-
-          <button class="cta-button" id="wishButton" type="button">
-            Zamisli zelju 🖤
-          </button>
         </div>
       </section>
 
@@ -749,6 +969,61 @@
                 <span class="game-card-desc">Spoji sve delove</span>
               </span>
             </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="phase phase-cake" data-phase="6" id="cakePhase">
+        <div class="phase-inner cake-inner">
+          <div class="cake-locked" id="cakeLocked">
+            <p class="eyebrow">iznenađenje</p>
+            <!-- <h1 class="headline">Negde se krije torta…</h1> -->
+            <p class="subtext">Odigraj sve četiri mini igre da je otključaš.</p>
+            <p class="cake-progress" id="cakeProgress">0 / 4 igre odigrane</p>
+          </div>
+
+          <div class="cake-unlocked" id="cakeUnlocked">
+            <p class="eyebrow">19. rođendan</p>
+            <!-- <h1 class="headline">Zamisli želju i dunimo svećice</h1> -->
+            <p class="subtext" id="cakeInstructions">
+              Zatvori oči na sekund, zamisli želju, pa tapni svaku svećicu da je
+              ugasiš — ili dunuti sve odjednom.
+            </p>
+
+            <div class="cake-scene" id="cakeScene">
+              <div class="candle-row" id="candleRow"></div>
+              <div class="cake-body">
+                <div class="cake-tier cake-tier-top"></div>
+                <div class="cake-tier cake-tier-bottom"></div>
+                <div class="cake-plate"></div>
+              </div>
+            </div>
+
+            <p class="cake-counter" id="cakeCounter">19 svećica čeka</p>
+            <button
+              class="cta-button game-secondary-btn"
+              id="blowAllButton"
+              type="button"
+            >
+              Dunuti sve odjednom 💨
+            </button>
+
+            <div class="cake-celebration" id="cakeCelebration">
+              <p class="final-note">Srećan 19. rođendan, Lola! 🎉🖤</p>
+              <p class="subtext">
+                Neka ova godina bude puna malih trenutaka, baš kao ovi.
+              </p>
+              <button class="cta-button" id="wishButton" type="button">
+                Zamisli želju 🖤
+              </button>
+              <button
+                class="cta-button game-secondary-btn"
+                id="relightButton"
+                type="button"
+              >
+                Upali ponovo 🕯️
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -801,9 +1076,9 @@
       // the scroll, and the whole field keeps deepening/brightening a bit
       // further as you keep scrolling, so the sky feels like it's being
       // uncovered rather than dumped on screen all at once.
-      const APPEAR_SCROLL_END = 0.1; // by this scroll progress, every star has appeared
+      const APPEAR_SCROLL_END = 0.5; // by this scroll progress, every star has appeared
       const APPEAR_FADE_WIDTH = 0.22; // how long (in scroll progress) each star takes to fade in
-      const SHINE_MIN = 0.1; // overall dimness at the very top of the page
+      const SHINE_MIN = 0.5; // overall dimness at the very top of the page
       const SHINE_SCROLL_RANGE = 0.6; // scroll progress over which brightness ramps up to full
 
       // Slow left/right drift applied only to the deep star layer (not the
@@ -861,8 +1136,16 @@
 
       const tooltip = document.getElementById("tooltip");
       const wishToast = document.getElementById("wishToast");
-      const wishButton = document.getElementById("wishButton");
       const skyContainer = document.getElementById("sky");
+
+      const cakePhase = document.getElementById("cakePhase");
+      const cakeProgressEl = document.getElementById("cakeProgress");
+      const cakeUnlockedEl = document.getElementById("cakeUnlocked");
+      const candleRow = document.getElementById("candleRow");
+      const cakeCounterEl = document.getElementById("cakeCounter");
+      const blowAllButton = document.getElementById("blowAllButton");
+      const relightButton = document.getElementById("relightButton");
+      const wishButton = document.getElementById("wishButton");
 
       let W = 0,
         H = 0,
@@ -2160,6 +2443,10 @@
       }
 
       window.addEventListener("mousemove", (e) => {
+        if (e.target.closest("button")) {
+          renderer.domElement.style.cursor = "default";
+          return;
+        }
         const star = findNearestStar(e.clientX, e.clientY);
         if (star) {
           hoveredStar = star;
@@ -2223,19 +2510,143 @@
         { passive: true },
       );
 
+      /* =========================================================
+         Birthday cake — unlocks once all four mini-games have been
+         completed at least once. 19 candles for her 19th; tap each
+         one to blow it out (or blow them all at once), and the last
+         flame going out triggers the final celebration.
+         ========================================================= */
+      const GAME_KEYS = ["memory", "catcher", "quiz", "puzzle"];
+      const CANDLE_COUNT = 19;
+      let completedGames = new Set();
+      let blownCandles = 0;
+
+      function markGameComplete(key) {
+        if (completedGames.has(key)) return;
+        completedGames.add(key);
+        updateCakeProgressUI();
+        if (completedGames.size === GAME_KEYS.length) unlockCake();
+      }
+
+      function updateCakeProgressUI() {
+        if (cakeProgressEl) {
+          cakeProgressEl.textContent = `${completedGames.size} / ${GAME_KEYS.length} igre odigrane`;
+        }
+      }
+
+      function unlockCake() {
+        if (!cakePhase || cakePhase.classList.contains("unlocked")) return;
+        cakePhase.classList.add("unlocked");
+        buildCandles();
+        showToast("Sve igre su odigrane! Torta te čeka 🎂", 2600);
+      }
+
+      function buildCandles() {
+        if (!candleRow) return;
+        candleRow.innerHTML = "";
+        blownCandles = 0;
+        updateCakeCounter();
+        for (let i = 0; i < CANDLE_COUNT; i++) {
+          const candle = document.createElement("button");
+          candle.type = "button";
+          candle.className = "candle";
+          candle.setAttribute("aria-label", "Svećica");
+          const flame = document.createElement("span");
+          flame.className = "candle-flame";
+          const smoke = document.createElement("span");
+          smoke.className = "candle-smoke";
+          candle.appendChild(flame);
+          candle.appendChild(smoke);
+          candle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            blowCandle(candle);
+          });
+          candleRow.appendChild(candle);
+        }
+      }
+
+      function updateCakeCounter() {
+        if (!cakeCounterEl) return;
+        const remaining = CANDLE_COUNT - blownCandles;
+        cakeCounterEl.textContent =
+          remaining > 0
+            ? `${remaining} svećica čeka`
+            : "Sve svećice su ugašene 🖤";
+      }
+
+      function blowCandle(candle) {
+        if (candle.classList.contains("blown")) return;
+        candle.classList.add("blown");
+        blownCandles++;
+        updateCakeCounter();
+        const rect = candle.getBoundingClientRect();
+        spawnBurst(rect.left + rect.width / 2, rect.top, "255,227,176", 10);
+        if (blownCandles >= CANDLE_COUNT) {
+          setTimeout(celebrateCake, 350);
+        }
+      }
+
+      function blowAllCandlesAtOnce() {
+        if (!candleRow) return;
+        const candles = candleRow.querySelectorAll(".candle:not(.blown)");
+        candles.forEach((candle, i) => {
+          setTimeout(() => blowCandle(candle), i * 60);
+        });
+      }
+
+      function celebrateCake() {
+        if (cakeUnlockedEl) cakeUnlockedEl.classList.add("all-blown");
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            spawnBurst(
+              Math.random() * W,
+              H * (0.2 + Math.random() * 0.5),
+              i % 2 === 0 ? "255,240,210" : "203,180,255",
+              20,
+            );
+          }, i * 180);
+        }
+        spawnShootingStar();
+        showToast("Srećan 19. rođendan! 🎉", 2800);
+      }
+
+      function resetCake() {
+        if (cakeUnlockedEl) cakeUnlockedEl.classList.remove("all-blown");
+        buildCandles();
+      }
+
+      // "Zamisli želju" — same fireworks-burst wish gesture the page used
+      // to have on its own screen, now living inside the post-candles
+      // celebration instead.
+      function makeWish() {
+        for (let i = 0; i < 5; i++) {
+          spawnBurst(
+            Math.random() * W,
+            H * (0.25 + Math.random() * 0.5),
+            "255,240,210",
+            14,
+          );
+        }
+        spawnShootingStar();
+        showToast("Zelja poslata u univerzum ✨", 2400);
+      }
+
+      if (blowAllButton) {
+        blowAllButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          blowAllCandlesAtOnce();
+        });
+      }
+      if (relightButton) {
+        relightButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          resetCake();
+        });
+      }
       if (wishButton) {
         wishButton.addEventListener("click", (e) => {
           e.stopPropagation();
-          for (let i = 0; i < 5; i++) {
-            spawnBurst(
-              Math.random() * W,
-              H * (0.25 + Math.random() * 0.5),
-              "255,240,210",
-              14,
-            );
-          }
-          spawnShootingStar();
-          showToast("Zelja poslata u univerzum ✨", 2400);
+          makeWish();
         });
       }
 
@@ -2402,6 +2813,7 @@
             matchedCount += 2;
             first = null;
             if (matchedCount === stickers.length) {
+              markGameComplete("memory");
               pendingTimeout = setTimeout(() => {
                 showGameResult("GG! 🎉", `Rešila si sve u ${moves} poteza.`);
               }, 500);
@@ -2495,6 +2907,7 @@
         function endCatcher() {
           if (ended) return;
           ended = true;
+          markGameComplete("catcher");
           clearTimeout(spawnTimer);
           clearInterval(tickTimer);
           stage.querySelectorAll(".catcher-star").forEach((s) => s.remove());
@@ -2598,6 +3011,7 @@
                   else if (pct >= 60)
                     msg = "Solidno! Imamo o čemu da pričamo. 😄";
                   else msg = "Hajde, moramo više da pričamo. 😉";
+                  markGameComplete("quiz");
                   showGameResult(`${score}/${QUIZ_QUESTIONS.length}`, msg);
                 }
               }, 900);
@@ -2708,6 +3122,7 @@
             render();
             if (isSolved(order)) {
               solved = true;
+              markGameComplete("puzzle");
               setTimeout(() => {
                 showGameResult(
                   "Uspela si! 🧩🖤",
