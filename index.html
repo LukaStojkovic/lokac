@@ -112,8 +112,28 @@
         font-size: clamp(1.6rem, 4.6vw, 2.9rem);
         line-height: 1.25;
         margin: 0 0 0.9rem;
-        color: var(--text-soft);
         text-shadow: 0 0 26px rgba(203, 180, 255, 0.35);
+        background: linear-gradient(
+          100deg,
+          var(--text-soft) 0%,
+          var(--accent-glow) 22%,
+          var(--accent-gold) 40%,
+          var(--text-soft) 58%,
+          var(--star-blue) 76%,
+          var(--text-soft) 100%
+        );
+        background-size: 260% auto;
+        background-position: 0% center;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        animation: shimmerText 9s linear infinite;
+      }
+      @keyframes shimmerText {
+        to {
+          background-position: -260% center;
+        }
       }
 
       .subtext {
@@ -162,6 +182,8 @@
       }
 
       .cta-button {
+        position: relative;
+        overflow: hidden;
         pointer-events: auto;
         font-family: var(--body-font);
         font-weight: 600;
@@ -181,6 +203,26 @@
         transition:
           transform 0.25s ease,
           box-shadow 0.35s ease;
+      }
+      .cta-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 45%;
+        height: 100%;
+        background: linear-gradient(
+          115deg,
+          transparent,
+          rgba(255, 255, 255, 0.65),
+          transparent
+        );
+        transform: skewX(-22deg);
+        transition: left 0.75s ease;
+        pointer-events: none;
+      }
+      .cta-button:hover::before {
+        left: 130%;
       }
       .cta-button:hover {
         transform: translateY(-2px) scale(1.02);
@@ -297,6 +339,19 @@
           transition: opacity 0.4s linear;
           transform: none !important;
         }
+        .headline {
+          animation: none;
+          background-position: 0% center;
+        }
+        .game-card,
+        .candle {
+          animation: none !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .cta-button::before {
+          display: none;
+        }
       }
 
       /* ---------- Mini-games section ---------- */
@@ -314,6 +369,7 @@
         border-radius: 28px;
         padding: 2.2rem 1.6rem;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        pointer-events: auto;
       }
       .game-picker {
         display: flex;
@@ -322,6 +378,8 @@
         margin-top: 1.8rem;
       }
       .game-card {
+        position: relative;
+        overflow: hidden;
         pointer-events: auto;
         display: flex;
         align-items: center;
@@ -334,15 +392,56 @@
         color: var(--text-soft);
         cursor: pointer;
         font-family: var(--body-font);
+        opacity: 0;
+        transform: translateY(16px);
         transition:
-          transform 0.25s ease,
+          transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.6s ease,
           background 0.25s ease,
           box-shadow 0.3s ease;
+        transition-delay: 0s, 0s, 0s, 0s;
+      }
+      .game-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(
+          115deg,
+          transparent,
+          rgba(255, 255, 255, 0.16),
+          transparent
+        );
+        transform: skewX(-22deg);
+        transition: left 0.7s ease;
+        pointer-events: none;
+      }
+      .game-card:hover::after {
+        left: 130%;
+      }
+      .phase-inner.visible .game-card {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .phase-inner.visible .game-card:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+      .phase-inner.visible .game-card:nth-child(2) {
+        transition-delay: 0.16s;
+      }
+      .phase-inner.visible .game-card:nth-child(3) {
+        transition-delay: 0.27s;
+      }
+      .phase-inner.visible .game-card:nth-child(4) {
+        transition-delay: 0.38s;
       }
       .game-card:hover {
         transform: translateY(-2px);
         background: rgba(255, 255, 255, 0.08);
         box-shadow: 0 10px 26px rgba(203, 180, 255, 0.18);
+        transition-delay: 0s;
       }
       .game-card:active {
         transform: translateY(0) scale(0.99);
@@ -748,6 +847,15 @@
         cursor: pointer;
         flex-shrink: 0;
         pointer-events: auto;
+        opacity: 0;
+        transform: translateY(10px) scale(0.7);
+        animation: candlePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+      }
+      @keyframes candlePop {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
       }
       .candle-flame {
         position: absolute;
@@ -903,6 +1011,39 @@
       .cake-celebration .cta-button + .cta-button {
         margin-top: 0.7rem;
       }
+
+      /* ---------- Confetti ---------- */
+      .confetti-piece {
+        position: fixed;
+        top: -24px;
+        width: 8px;
+        height: 14px;
+        pointer-events: none;
+        z-index: 15;
+        opacity: 0.95;
+        will-change: transform, opacity;
+        animation-name: confettiFall;
+        animation-timing-function: cubic-bezier(0.36, 0.2, 0.6, 1);
+        animation-fill-mode: forwards;
+      }
+      @keyframes confettiFall {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        85% {
+          opacity: 0.95;
+        }
+        100% {
+          transform: translate(var(--drift, 0px), 108vh) rotate(600deg);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .confetti-piece {
+          display: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -964,7 +1105,7 @@
       </section>
 
       <section class="phase phase-games" data-phase="5">
-        <div class="phase-inner games-inner">
+        <div class="phase-inner games-inner ui-surface">
           <!-- <p class="eyebrow">bonus za rođendan</p> -->
           <h1 class="headline">Mini igre</h1>
           <p class="subtext">Izaberi igru</p>
@@ -1005,7 +1146,7 @@
       </section>
 
       <section class="phase phase-cake" data-phase="6" id="cakePhase">
-        <div class="phase-inner cake-inner">
+        <div class="phase-inner cake-inner ui-surface">
           <div class="cake-locked" id="cakeLocked">
             <p class="eyebrow">iznenađenje</p>
 
@@ -1065,7 +1206,7 @@
       </section>
     </main>
 
-    <div class="game-overlay" id="gameOverlay" aria-hidden="true">
+    <div class="game-overlay ui-surface" id="gameOverlay" aria-hidden="true">
       <div class="game-panel">
         <button
           class="game-close"
@@ -1504,6 +1645,16 @@
          real, clearly visible comet streak instead. */
       let shootingStarsList = [];
 
+      // Small palette of comet hues — chosen at spawn time so shooting
+      // stars read as a little more varied than a single fixed white/gold.
+      const SHOOTING_COLOR_SETS = [
+        { trail: [1, 1, 1], head: 0xffffff },
+        { trail: [203 / 255, 180 / 255, 1], head: 0xcbb4ff },
+        { trail: [1, 227 / 255, 176 / 255], head: 0xffe3b0 },
+        { trail: [185 / 255, 200 / 255, 1], head: 0xb9c8ff },
+        { trail: [1, 200 / 255, 214 / 255], head: 0xffc8d6 },
+      ];
+
       function makeCometMaterial() {
         const m = makeLineMaterial();
         m.blending = THREE.AdditiveBlending;
@@ -1516,6 +1667,7 @@
         const startX = fromLeft ? -60 : W + 60;
         const startY = Math.random() * H * 0.6;
         const speed = 9 + Math.random() * 6;
+        const colorSet = pick(SHOOTING_COLOR_SETS);
 
         const geo = new THREE.BufferGeometry();
         geo.setAttribute(
@@ -1540,7 +1692,7 @@
 
         const headMat = new THREE.SpriteMaterial({
           map: softCircleTexture,
-          color: 0xffffff,
+          color: colorSet.head,
           transparent: true,
           opacity: 0,
           depthWrite: false,
@@ -1562,6 +1714,7 @@
           geo,
           mesh,
           head,
+          colorSet,
         });
       }
 
@@ -1594,6 +1747,7 @@
 
           const pos = s.geo.attributes.position.array;
           const col = s.geo.attributes.aColor.array;
+          const tc = s.colorSet ? s.colorSet.trail : [1, 1, 1];
           pos[0] = headLx;
           pos[1] = headLy;
           pos[2] = 0;
@@ -1603,17 +1757,17 @@
           pos[6] = tailX;
           pos[7] = tailY;
           pos[8] = 0;
-          col[0] = 1;
-          col[1] = 1;
-          col[2] = 1;
+          col[0] = tc[0];
+          col[1] = tc[1];
+          col[2] = tc[2];
           col[3] = 0.9 * alpha;
-          col[4] = 1;
-          col[5] = 1;
-          col[6] = 1;
+          col[4] = tc[0];
+          col[5] = tc[1];
+          col[6] = tc[2];
           col[7] = 0.9 * alpha;
-          col[8] = 200 / 255;
-          col[9] = 210 / 255;
-          col[10] = 255 / 255;
+          col[8] = tc[0];
+          col[9] = tc[1];
+          col[10] = tc[2];
           col[11] = 0;
           s.geo.attributes.position.needsUpdate = true;
           s.geo.attributes.aColor.needsUpdate = true;
@@ -1640,6 +1794,11 @@
             dy = s.y - py;
           if (Math.sqrt(dx * dx + dy * dy) < 34) {
             spawnBurst(s.x, s.y, "255,240,210", 22);
+            spawnRingBurst(s.x, s.y, 0xffe3b0, {
+              maxLife: 34,
+              startR: 4,
+              endR: 30,
+            });
             showToast(pick(SHOOTING_MESSAGES), 2200);
             scene.remove(s.mesh);
             scene.remove(s.head);
@@ -1773,6 +1932,53 @@
         sparkleGeo.attributes.aAlpha.needsUpdate = true;
         sparkleGeo.attributes.aColor.needsUpdate = true;
         sparkleGeo.attributes.aRadius.needsUpdate = true;
+      }
+
+      /* ---------- expanding ring bursts (key-moment feedback) ----------
+         A short-lived, outward-expanding, fading ring — used to punctuate
+         moments that matter (planting a wish, catching a shooting star,
+         blowing a candle, finishing a mini-game, the final celebration)
+         without relying only on the particle burst. */
+      let ringBurstList = [];
+
+      function spawnRingBurst(x, y, colorHex, opts) {
+        const options = opts || {};
+        const mat = new THREE.LineBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+          depthWrite: false,
+        });
+        const mesh = new THREE.LineLoop(ringGeo, mat);
+        mesh.renderOrder = 9;
+        mesh.frustumCulled = false;
+        mesh.position.set(x, y, 0.4);
+        scene.add(mesh);
+        ringBurstList.push({
+          mesh,
+          life: 0,
+          maxLife: options.maxLife || 42,
+          startR: options.startR || 6,
+          endR: options.endR || 52,
+        });
+      }
+
+      function updateAndDrawRingBursts() {
+        for (let i = ringBurstList.length - 1; i >= 0; i--) {
+          const b = ringBurstList[i];
+          b.life++;
+          const t = clamp(b.life / b.maxLife, 0, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const r = lerp(b.startR, b.endR, eased);
+          b.mesh.scale.set(r, r, 1);
+          b.mesh.material.opacity = 0.85 * (1 - t);
+          if (b.life >= b.maxLife) {
+            scene.remove(b.mesh);
+            b.mesh.material.dispose();
+            ringBurstList.splice(i, 1);
+          }
+        }
       }
 
       /* =========================================================
@@ -2079,6 +2285,11 @@
       function plantWishStar(px, py) {
         if (activeStarCount >= starCapacity) {
           spawnBurst(px, py, "255,227,176", 16);
+          spawnRingBurst(px, py, 0xffe3b0, {
+            maxLife: 32,
+            startR: 3,
+            endR: 26,
+          });
           showToast(pick(WISH_MESSAGES), 1900);
           return;
         }
@@ -2102,6 +2313,7 @@
         starsGeo.attributes.aIsLetter.needsUpdate = true;
 
         spawnBurst(px, py, "255,227,176", 16);
+        spawnRingBurst(px, py, 0xffe3b0, { maxLife: 32, startR: 3, endR: 26 });
         showToast(pick(WISH_MESSAGES), 1900);
       }
 
@@ -2294,6 +2506,55 @@
         letterGeo.attributes.aColor.needsUpdate = true;
       }
 
+      // Fires exactly once, the moment the scattered stars finish lerping
+      // into the "SRECAN RODJEDAN LOLA" message — a little payoff for
+      // having scrolled all the way there.
+      let letterCelebrated = false;
+
+      function triggerLetterCelebration() {
+        let minX = Infinity,
+          maxX = -Infinity,
+          minY = Infinity,
+          maxY = -Infinity;
+        let any = false;
+        for (const s of starList) {
+          if (!s.isLetter) continue;
+          any = true;
+          if (s.x < minX) minX = s.x;
+          if (s.x > maxX) maxX = s.x;
+          if (s.y < minY) minY = s.y;
+          if (s.y > maxY) maxY = s.y;
+        }
+        if (!any) return;
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const spanX = Math.max(maxX - minX, 80);
+
+        spawnRingBurst(cx, cy, 0xcbb4ff, {
+          maxLife: 60,
+          startR: 10,
+          endR: spanX * 0.7,
+        });
+        setTimeout(
+          () =>
+            spawnRingBurst(cx, cy, 0xffe3b0, {
+              maxLife: 55,
+              startR: 8,
+              endR: spanX * 0.55,
+            }),
+          140,
+        );
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            const bx = cx + (Math.random() - 0.5) * spanX * 0.9;
+            const by = cy + (Math.random() - 0.5) * 60;
+            spawnBurst(bx, by, i % 2 === 0 ? "203,180,255" : "255,227,176", 18);
+          }, i * 160);
+        }
+        spawnShootingStar();
+        showToast("Sve zvezde su na svom mestu ✨", 2600);
+      }
+
       function updateFinalAura(finalGlowT) {
         if (finalGlowT <= 0) {
           auraMaterial.opacity = 0;
@@ -2422,6 +2683,14 @@
       /* =========================================================
          Tooltip / toast / interaction (unchanged behaviour)
          ========================================================= */
+      // Selector for "UI surfaces" that must never let clicks/hovers
+      // fall through to the star canvas underneath them — covers real
+      // <button> elements plus opaque interactive panels (mini-game
+      // picker card, the cake card) that have empty space around their
+      // controls (e.g. the thin candles) where a miss used to leak
+      // straight through to the sky.
+      const UI_BLOCK_SELECTOR = "button, .ui-surface";
+
       function findNearestStar(px, py) {
         let nearest = null,
           nearestDist = CONFIG.hoverRadius;
@@ -2478,11 +2747,45 @@
         }
       }
 
+      // A faint trail of tiny sparkles follows the cursor/finger across the
+      // open sky — distance- and time-throttled so it stays subtle rather
+      // than flooding the sparkle pool.
+      let lastTrailTime = 0;
+      let lastTrailX = -9999;
+      let lastTrailY = -9999;
+      const TRAIL_MIN_DIST = 16;
+      const TRAIL_MIN_INTERVAL = 45;
+
+      function maybeSpawnTrailSparkle(x, y) {
+        if (CONFIG.reducedMotion) return;
+        const now = performance.now();
+        const dist = Math.hypot(x - lastTrailX, y - lastTrailY);
+        if (now - lastTrailTime < TRAIL_MIN_INTERVAL || dist < TRAIL_MIN_DIST)
+          return;
+        lastTrailTime = now;
+        lastTrailX = x;
+        lastTrailY = y;
+        if (sparkleList.length >= MAX_SPARKLES) sparkleList.shift();
+        const hue = Math.random() < 0.75 ? [238, 241, 255] : [203, 180, 255];
+        sparkleList.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35 - 0.12,
+          life: 0,
+          maxLife: 24 + Math.random() * 14,
+          radius: 0.6 + Math.random() * 0.8,
+          color: hue.map((v) => v / 255),
+        });
+      }
+
       window.addEventListener("mousemove", (e) => {
-        if (e.target.closest("button")) {
+        if (e.target.closest(UI_BLOCK_SELECTOR)) {
           renderer.domElement.style.cursor = "default";
+          hideTooltip();
           return;
         }
+        maybeSpawnTrailSparkle(e.clientX, e.clientY);
         const star = findNearestStar(e.clientX, e.clientY);
         if (star) {
           hoveredStar = star;
@@ -2497,21 +2800,23 @@
       window.addEventListener("mouseleave", hideTooltip);
 
       window.addEventListener("click", (e) => {
-        if (e.target.closest("button")) return;
+        if (e.target.closest(UI_BLOCK_SELECTOR)) return;
         handleSkyInteraction(e.clientX, e.clientY, false);
       });
 
       let touchStartX = 0,
         touchStartY = 0,
         touchStartTime = 0,
-        touchMoved = false;
+        touchMoved = false,
+        touchStartedOnUi = false;
       const TAP_MAX_MOVE = 12;
       const TAP_MAX_DURATION = 450;
 
       window.addEventListener(
         "touchstart",
         (e) => {
-          if (e.target.closest("button")) return;
+          touchStartedOnUi = !!e.target.closest(UI_BLOCK_SELECTOR);
+          if (touchStartedOnUi) return;
           const touch = e.touches[0];
           if (!touch) return;
           touchStartX = touch.clientX;
@@ -2525,11 +2830,13 @@
       window.addEventListener(
         "touchmove",
         (e) => {
+          if (touchStartedOnUi) return;
           const touch = e.touches[0];
           if (!touch) return;
           const dx = touch.clientX - touchStartX;
           const dy = touch.clientY - touchStartY;
           if (Math.sqrt(dx * dx + dy * dy) > TAP_MAX_MOVE) touchMoved = true;
+          maybeSpawnTrailSparkle(touch.clientX, touch.clientY);
         },
         { passive: true },
       );
@@ -2537,7 +2844,7 @@
       window.addEventListener(
         "touchend",
         (e) => {
-          if (e.target.closest("button")) return;
+          if (touchStartedOnUi || e.target.closest(UI_BLOCK_SELECTOR)) return;
           if (touchMoved) return;
           const duration = performance.now() - touchStartTime;
           if (duration > TAP_MAX_DURATION) return;
@@ -2561,6 +2868,11 @@
         if (completedGames.has(key)) return;
         completedGames.add(key);
         updateCakeProgressUI();
+        spawnRingBurst(W / 2, H * 0.28, 0xcbb4ff, {
+          maxLife: 46,
+          startR: 6,
+          endR: 60,
+        });
         if (completedGames.size === GAME_KEYS.length) unlockCake();
       }
 
@@ -2616,7 +2928,13 @@
         blownCandles++;
         updateCakeCounter();
         const rect = candle.getBoundingClientRect();
-        spawnBurst(rect.left + rect.width / 2, rect.top, "255,227,176", 10);
+        const cxp = rect.left + rect.width / 2;
+        spawnBurst(cxp, rect.top, "255,227,176", 10);
+        spawnRingBurst(cxp, rect.top, 0xffe3b0, {
+          maxLife: 26,
+          startR: 3,
+          endR: 18,
+        });
         if (blownCandles >= CANDLE_COUNT) {
           setTimeout(celebrateCake, 350);
         }
@@ -2634,16 +2952,49 @@
         if (cakeUnlockedEl) cakeUnlockedEl.classList.add("all-blown");
         for (let i = 0; i < 6; i++) {
           setTimeout(() => {
-            spawnBurst(
-              Math.random() * W,
-              H * (0.2 + Math.random() * 0.5),
-              i % 2 === 0 ? "255,240,210" : "203,180,255",
-              20,
-            );
+            const bx = Math.random() * W;
+            const by = H * (0.2 + Math.random() * 0.5);
+            const goldish = i % 2 === 0;
+            spawnBurst(bx, by, goldish ? "255,240,210" : "203,180,255", 20);
+            spawnRingBurst(bx, by, goldish ? 0xffe3b0 : 0xcbb4ff, {
+              maxLife: 40,
+              startR: 4,
+              endR: 34,
+            });
           }, i * 180);
         }
         spawnShootingStar();
+        spawnConfetti();
         showToast("Srećan 19. rođendan! 🎉", 2800);
+      }
+
+      // Real DOM confetti for the finale — falls, drifts, and spins over
+      // the whole viewport, on top of the star-canvas particle bursts.
+      const CONFETTI_COLORS = [
+        "#cbb4ff",
+        "#ffe3b0",
+        "#eef1ff",
+        "#b9c8ff",
+        "#ffc8d6",
+      ];
+      function spawnConfetti(count) {
+        if (CONFIG.reducedMotion) return;
+        const total = count || 130;
+        for (let i = 0; i < total; i++) {
+          const el = document.createElement("div");
+          el.className = "confetti-piece";
+          const duration = 2.6 + Math.random() * 2.4;
+          const delay = Math.random() * 0.7;
+          el.style.left = Math.random() * 100 + "vw";
+          el.style.background =
+            CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+          el.style.borderRadius = Math.random() < 0.5 ? "50%" : "2px";
+          el.style.setProperty("--drift", (Math.random() - 0.5) * 160 + "px");
+          el.style.animationDuration = duration + "s";
+          el.style.animationDelay = delay + "s";
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), (duration + delay) * 1000 + 300);
+        }
       }
 
       function resetCake() {
@@ -2656,12 +3007,14 @@
       // celebration instead.
       function makeWish() {
         for (let i = 0; i < 5; i++) {
-          spawnBurst(
-            Math.random() * W,
-            H * (0.25 + Math.random() * 0.5),
-            "255,240,210",
-            14,
-          );
+          const bx = Math.random() * W;
+          const by = H * (0.25 + Math.random() * 0.5);
+          spawnBurst(bx, by, "255,240,210", 14);
+          spawnRingBurst(bx, by, 0xffe3b0, {
+            maxLife: 36,
+            startR: 3,
+            endR: 26,
+          });
         }
         spawnShootingStar();
         showToast("Zelja poslata u univerzum ✨", 2400);
@@ -2784,7 +3137,7 @@
         }
 
         gameContainer.innerHTML = `
-          <p class="game-title">Igra pamćenja 🧠</p>
+          <p class="game-title">Memory game 🧠</p>
           <p class="game-subtitle">Pronađi sve parove.</p>
           <div class="memory-grid" id="memoryGrid"></div>
           <p class="game-hud" id="memoryHud">Potezi: 0</p>
@@ -3094,7 +3447,7 @@
         function renderPuzzle() {
           gameContainer.innerHTML = `
             <p class="game-title">Puzla 🧩</p>
-            <p class="game-subtitle">Tapni dva dela da ih zameniš mesta, dok slika ne bude cela.</p>
+            <p class="game-subtitle">Spoji puzlu</p>
             <div class="puzzle-wrap">
               <div class="puzzle-board" id="puzzleBoard" style="--puzzle-grid:${PUZZLE_GRID}"></div>
             </div>
@@ -3224,6 +3577,12 @@
         maybeSpawnShootingStar();
         updateAndDrawShootingStars();
         updateAndDrawSparkles();
+        updateAndDrawRingBursts();
+
+        if (!letterCelebrated && letterT >= 0.999) {
+          letterCelebrated = true;
+          triggerLetterCelebration();
+        }
 
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
