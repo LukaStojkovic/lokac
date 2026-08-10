@@ -23,6 +23,12 @@
       }
     </script>
 
+    <!-- EmailJS — lets the "send a letter" form email you directly from
+         the browser, no backend needed. Loaded as a plain script (not a
+         module) so it's available on window.emailjs before the module
+         script below runs. -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
     <style>
       :root {
         --ink-deep: #05061a;
@@ -999,7 +1005,8 @@
       .cake-unlocked.all-blown .cake-scene,
       .cake-unlocked.all-blown .cake-counter,
       .cake-unlocked.all-blown #blowAllButton,
-      .cake-unlocked.all-blown #cakeInstructions {
+      .cake-unlocked.all-blown #cakeInstructions,
+      .cake-unlocked.all-blown #cakeHeadline {
         display: none;
       }
       .cake-unlocked.all-blown .cake-celebration {
@@ -1044,6 +1051,153 @@
           display: none;
         }
       }
+
+      /* ---------- Letter overlay (read letter + send letter) ---------- */
+      .letter-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(5, 6, 26, 0.62);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .letter-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .letter-paper {
+        position: relative;
+        width: min(92vw, 460px);
+        max-height: 84vh;
+        overflow-y: auto;
+        padding: 2.4rem 2rem 2rem;
+        border-radius: 6px;
+        color: #3d2b1f;
+        background:
+          radial-gradient(
+            circle at 12% 8%,
+            rgba(150, 105, 60, 0.14),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(150, 105, 60, 0.16),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 70% 15%,
+            rgba(150, 105, 60, 0.08),
+            transparent 35%
+          ),
+          linear-gradient(160deg, #f3e3c4 0%, #e8d3a5 55%, #ecd9ae 100%);
+        box-shadow:
+          0 26px 70px rgba(0, 0, 0, 0.55),
+          inset 0 0 0 1px rgba(120, 82, 40, 0.25),
+          inset 0 0 40px rgba(120, 82, 40, 0.12);
+        transform: rotate(-0.6deg) translateY(10px) scale(0.97);
+        opacity: 0;
+        transition:
+          transform 0.35s ease,
+          opacity 0.35s ease;
+      }
+      .letter-overlay.visible .letter-paper {
+        transform: rotate(-0.6deg) translateY(0) scale(1);
+        opacity: 1;
+      }
+      .letter-paper::before {
+        /* torn/deckled edge illusion */
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px dashed rgba(120, 82, 40, 0.3);
+        border-radius: 3px;
+        pointer-events: none;
+      }
+      .letter-seal {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0.6rem;
+        font-size: 1.6rem;
+        filter: drop-shadow(0 2px 4px rgba(120, 82, 40, 0.35));
+      }
+      .letter-heading {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1.35rem;
+        text-align: center;
+        margin: 0 0 1.2rem;
+        color: #5a3d24;
+      }
+      .letter-text {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.08rem;
+        line-height: 1.85;
+        color: #3d2b1f;
+        white-space: pre-line;
+      }
+      .letter-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid rgba(120, 82, 40, 0.35);
+        background: rgba(120, 82, 40, 0.08);
+        color: #5a3d24;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .letter-label {
+        display: block;
+        font-family: var(--body-font);
+        font-weight: 600;
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6b4c2e;
+        margin: 1rem 0 0.4rem;
+      }
+      .letter-input,
+      .letter-textarea {
+        width: 100%;
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1rem;
+        color: #3d2b1f;
+        background: rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(120, 82, 40, 0.3);
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        resize: vertical;
+      }
+      .letter-input:focus,
+      .letter-textarea:focus {
+        outline: none;
+        border-color: rgba(120, 82, 40, 0.6);
+      }
+      .letter-form .cta-button {
+        margin-top: 1.3rem;
+        width: 100%;
+        background: linear-gradient(135deg, #f3e3c4, #cbb4ff);
+      }
+      .letter-status {
+        text-align: center;
+        font-size: 0.82rem;
+        color: #6b4c2e;
+        margin: 0.7rem 0 0;
+        min-height: 1.1em;
+      }
     </style>
   </head>
   <body>
@@ -1071,10 +1225,11 @@
 
       <section class="phase phase-2" data-phase="2">
         <div class="phase-inner">
-          <p class="eyebrow">negde između februara i sada</p>
+          <p class="eyebrow">Moj mali znak pažnje za tvoj rođendan.</p>
           <!-- EDIT ME: mid-scroll line -->
           <h1 class="headline">
-            Svaka kasna noć, svaki poziv, svaka poruka — sve je još uvek ovde.
+            Ponekad neko uđe u naš život na kratko, ali dovoljno da svakodnevicu
+            učini lepšom.
           </h1>
           <p class="subtext">Pređi preko zvezde. Reći će ti nešto.</p>
         </div>
@@ -1082,11 +1237,9 @@
 
       <section class="phase phase-3" data-phase="3">
         <div class="phase-inner">
-          <p class="eyebrow">Mali trenuci pronašli su svoje mesto.</p>
+          <p class="eyebrow">Sve ovo nije bilo nasumično.</p>
           <!-- EDIT ME: transition line -->
-          <h1 class="headline">
-            Sačuvani među zvezdama, baš onako kako ih pamtim.
-          </h1>
+          <h1 class="headline">Samo je trebalo malo vremena da se složi.</h1>
         </div>
       </section>
 
@@ -1160,11 +1313,11 @@
 
           <div class="cake-unlocked" id="cakeUnlocked">
             <!-- <p class="eyebrow">19. rođendan</p> -->
-            <!-- <h1 class="headline">Zamisli želju i dunimo svećice</h1> -->
-            <p class="subtext" id="cakeInstructions">
+            <h1 class="headline" id="cakeHeadline">Zamisli želju i duni svećice</h1>
+            <!-- <p class="subtext" id="cakeInstructions">
               Zatvori oči na sekund, zamisli želju, pa tapni svaku svećicu da je
               ugasiš — ili dunuti sve odjednom.
-            </p>
+            </p> -->
 
             <div class="cake-scene" id="cakeScene">
               <div class="candle-row" id="candleRow"></div>
@@ -1181,11 +1334,11 @@
               id="blowAllButton"
               type="button"
             >
-              Dunuti sve odjednom 💨
+              Duni sve 💨
             </button>
 
             <div class="cake-celebration" id="cakeCelebration">
-              <p class="final-note">Srećan 19. rođendan, Lola! 🎉🖤</p>
+              <p class="final-note">Srećan rođendan, Lola! 🎉🖤</p>
               <p class="subtext">
                 Zelim ti puno srece, da ostvaris sve sto zelis i da te u zivotu
                 prate ljudi koji ce umeti da te vole na nacin koji zasluzujes.
@@ -1195,10 +1348,17 @@
               </button>
               <button
                 class="cta-button game-secondary-btn"
-                id="relightButton"
+                id="readLetterButton"
                 type="button"
               >
-                Upali ponovo 🕯️
+                Pročitaj pismo 💌
+              </button>
+              <button
+                class="cta-button game-secondary-btn"
+                id="sendLetterButton"
+                type="button"
+              >
+                Pošalji pismo u univerzum ✉️
               </button>
             </div>
           </div>
@@ -1217,6 +1377,77 @@
           ✕
         </button>
         <div class="game-container" id="gameContainer"></div>
+      </div>
+    </div>
+
+    <!-- Read-only letter, styled like an old piece of paper -->
+    <div
+      class="letter-overlay ui-surface"
+      id="letterOverlay"
+      aria-hidden="true"
+    >
+      <div class="letter-paper">
+        <button
+          class="letter-close"
+          id="letterClose"
+          type="button"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <div class="letter-seal">🕯️</div>
+        <p class="letter-heading">
+          26.8.2026. dan kad su nove zvezde prestale da sijaju
+        </p>
+        <p class="letter-text">
+          <!-- EDIT ME: napiši ovde svoje pismo za nju. Ostavi prazne linije
+               (\n\n) tamo gde želiš pasus, tekst se prikazuje tačno kako je
+               napisan. -->
+          Mozda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile daleko i sede nasmejane gledajuci u mnogo vece sazvedje
+        </p>
+      </div>
+    </div>
+
+    <!-- Form for her to write her own letter and send it into the universe -->
+    <div
+      class="letter-overlay ui-surface"
+      id="sendLetterOverlay"
+      aria-hidden="true"
+    >
+      <div class="letter-paper">
+        <button
+          class="letter-close"
+          id="sendLetterClose"
+          type="button"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <div class="letter-form" id="sendLetterForm">
+          <div class="letter-seal">✉️</div>
+          <p class="letter-heading">Pošalji pismo u univerzum</p>
+          <p class="letter-text" style="font-size: 0.92rem; line-height: 1.6">
+            Napiši poruku
+          </p>
+          <label class="letter-label" for="letterTo">Kome</label>
+          <input
+            class="letter-input"
+            id="letterTo"
+            type="text"
+            placeholder="kome..."
+          />
+          <label class="letter-label" for="letterContent">Poruka</label>
+          <textarea
+            class="letter-textarea"
+            id="letterContent"
+            rows="6"
+            placeholder="Napiši šta god želiš..."
+          ></textarea>
+          <button class="cta-button" id="letterSubmitButton" type="button">
+            Pošalji 💌
+          </button>
+          <p class="letter-status" id="letterStatus"></p>
+        </div>
       </div>
     </div>
 
@@ -1287,15 +1518,16 @@
         "Ova zvezda pamti svaki put kad si mi rekla da ces da me prebijes",
         "Ova zvezda pamti nas prvi odgledan film",
         "Ova zvezda pamti 30.01.2026.",
+        "Ova zvezda pamti nasu kucu u minecraftu",
       ];
 
       const WISH_MESSAGES = [
         "Mala želja, posađena ✨",
         "Ova je sada tvoja 🌟",
-        "Nešto lepo, samo za danas",
-        "Mala zvezda za malu želju",
+        "Nebo je upravo postalo malo lepše ✨",
+        // "Mala zvezda za malu želju",
         "Poslato u nebo 🎉",
-        "Još jedna zvezda, tek tako",
+        "Još jedna zvezda u tvom univerzumu ✨",
       ];
 
       const SHOOTING_MESSAGES = [
@@ -1321,7 +1553,6 @@
       const candleRow = document.getElementById("candleRow");
       const cakeCounterEl = document.getElementById("cakeCounter");
       const blowAllButton = document.getElementById("blowAllButton");
-      const relightButton = document.getElementById("relightButton");
       const wishButton = document.getElementById("wishButton");
 
       let W = 0,
@@ -2686,9 +2917,9 @@
       // Selector for "UI surfaces" that must never let clicks/hovers
       // fall through to the star canvas underneath them — covers real
       // <button> elements plus opaque interactive panels (mini-game
-      // picker card, the cake card) that have empty space around their
-      // controls (e.g. the thin candles) where a miss used to leak
-      // straight through to the sky.
+      // picker card, the cake card, letter overlays) that have empty
+      // space around their controls where a miss used to leak straight
+      // through to the sky.
       const UI_BLOCK_SELECTOR = "button, .ui-surface";
 
       function findNearestStar(px, py) {
@@ -2997,11 +3228,6 @@
         }
       }
 
-      function resetCake() {
-        if (cakeUnlockedEl) cakeUnlockedEl.classList.remove("all-blown");
-        buildCandles();
-      }
-
       // "Zamisli želju" — same fireworks-burst wish gesture the page used
       // to have on its own screen, now living inside the post-candles
       // celebration instead.
@@ -3026,16 +3252,167 @@
           blowAllCandlesAtOnce();
         });
       }
-      if (relightButton) {
-        relightButton.addEventListener("click", (e) => {
-          e.stopPropagation();
-          resetCake();
-        });
-      }
       if (wishButton) {
         wishButton.addEventListener("click", (e) => {
           e.stopPropagation();
           makeWish();
+        });
+      }
+
+      /* =========================================================
+         Letter overlays — reading her letter, and sending her own
+         letter "into the universe" (delivered to you by email).
+         ========================================================= */
+
+      // EDIT ME — EmailJS config (from https://www.emailjs.com, free tier).
+      // 1. Create an account, connect an email service (Gmail etc.) →
+      //    copy its "Service ID" into EMAILJS_SERVICE_ID below.
+      // 2. Create an email template with a fixed "To email" = your own
+      //    address, and a body using {{za}} and {{poruka}} (see the two
+      //    variables sent below) → copy its "Template ID".
+      // 3. Account → General → copy your "Public Key".
+      // Leave any of these empty and the form falls back to opening her
+      // email client instead (still reaches you, just needs her to hit
+      // "send" once in her own mail app).
+      const EMAILJS_SERVICE_ID = "service_mvd2zgs"; // e.g. "service_abc1234"
+      const EMAILJS_TEMPLATE_ID = "template_6xvcmid"; // e.g. "template_xyz789"
+      const EMAILJS_PUBLIC_KEY = "YIaU-95-g9f3PV6gO"; // e.g. "AbCdEfGhIjKlMnOp"
+      // EDIT ME: your email address, used only for the mailto: fallback above.
+      const LETTER_RECEIVER_EMAIL = "lukastojkovicalt@gmail.com";
+
+      const emailjsReady =
+        !!(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) &&
+        typeof window.emailjs !== "undefined";
+      if (emailjsReady) {
+        window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      }
+
+      const letterOverlay = document.getElementById("letterOverlay");
+      const letterClose = document.getElementById("letterClose");
+      const readLetterButton = document.getElementById("readLetterButton");
+
+      const sendLetterOverlay = document.getElementById("sendLetterOverlay");
+      const sendLetterClose = document.getElementById("sendLetterClose");
+      const sendLetterButton = document.getElementById("sendLetterButton");
+      const letterToInput = document.getElementById("letterTo");
+      const letterContentInput = document.getElementById("letterContent");
+      const letterSubmitButton = document.getElementById("letterSubmitButton");
+      const letterStatusEl = document.getElementById("letterStatus");
+
+      function openLetterOverlay(overlay) {
+        if (!overlay) return;
+        overlay.classList.add("visible");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      function closeLetterOverlay(overlay) {
+        if (!overlay) return;
+        overlay.classList.remove("visible");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      if (readLetterButton) {
+        readLetterButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openLetterOverlay(letterOverlay);
+        });
+      }
+      if (letterClose) {
+        letterClose.addEventListener("click", () =>
+          closeLetterOverlay(letterOverlay),
+        );
+      }
+      if (letterOverlay) {
+        letterOverlay.addEventListener("click", (e) => {
+          if (e.target === letterOverlay) closeLetterOverlay(letterOverlay);
+        });
+      }
+
+      if (sendLetterButton) {
+        sendLetterButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (letterStatusEl) letterStatusEl.textContent = "";
+          openLetterOverlay(sendLetterOverlay);
+        });
+      }
+      if (sendLetterClose) {
+        sendLetterClose.addEventListener("click", () =>
+          closeLetterOverlay(sendLetterOverlay),
+        );
+      }
+      if (sendLetterOverlay) {
+        sendLetterOverlay.addEventListener("click", (e) => {
+          if (e.target === sendLetterOverlay)
+            closeLetterOverlay(sendLetterOverlay);
+        });
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (letterOverlay && letterOverlay.classList.contains("visible"))
+          closeLetterOverlay(letterOverlay);
+        if (
+          sendLetterOverlay &&
+          sendLetterOverlay.classList.contains("visible")
+        )
+          closeLetterOverlay(sendLetterOverlay);
+      });
+
+      async function submitUniverseLetter() {
+        const to = (letterToInput && letterToInput.value) || "";
+        const content = (letterContentInput && letterContentInput.value) || "";
+
+        if (!to.trim() || !content.trim()) {
+          if (letterStatusEl)
+            letterStatusEl.textContent = "Popuni oba polja pre slanja 🙂";
+          return;
+        }
+
+        if (letterSubmitButton) letterSubmitButton.disabled = true;
+        if (letterStatusEl) letterStatusEl.textContent = "Šaljem...";
+
+        let sentAutomatically = false;
+        if (emailjsReady) {
+          try {
+            const res = await window.emailjs.send(
+              EMAILJS_SERVICE_ID,
+              EMAILJS_TEMPLATE_ID,
+              {
+                za: to,
+                poruka: content,
+                poslato: new Date().toLocaleString("sr-RS"),
+              },
+            );
+            sentAutomatically = res && res.status === 200;
+          } catch (err) {
+            sentAutomatically = false;
+          }
+        }
+
+        if (sentAutomatically) {
+          if (letterStatusEl)
+            letterStatusEl.textContent = "Poslato u univerzum ✨";
+          spawnConfetti(40);
+          if (letterToInput) letterToInput.value = "";
+          if (letterContentInput) letterContentInput.value = "";
+          if (letterSubmitButton) letterSubmitButton.disabled = false;
+          return;
+        }
+
+        // Fallback: open her email client with everything prefilled, so the
+        // letter still reaches you even without any backend/API set up.
+        const subject = encodeURIComponent(`Pismo iz univerzuma — za: ${to}`);
+        const body = encodeURIComponent(`Za: ${to}\n\n${content}`);
+        window.location.href = `mailto:${LETTER_RECEIVER_EMAIL}?subject=${subject}&body=${body}`;
+        if (letterStatusEl)
+          letterStatusEl.textContent =
+            "Otvara se tvoj mejl da pošalješ poruku ✉️";
+        if (letterSubmitButton) letterSubmitButton.disabled = false;
+      }
+
+      if (letterSubmitButton) {
+        letterSubmitButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          submitUniverseLetter();
         });
       }
 
@@ -3204,7 +3581,7 @@
             if (matchedCount === stickers.length) {
               markGameComplete("memory");
               pendingTimeout = setTimeout(() => {
-                showGameResult("GG! 🎉", `Rešila si sve u ${moves} poteza.`);
+                showGameResult("GG! 🎉", `Rešila si u ${moves} poteza.`);
               }, 500);
             }
           } else {
@@ -3251,7 +3628,7 @@
           spawnTimer = null,
           tickTimer = null,
           ended = false;
-        const starGlyphs = ["⭐", "✨", "🌟"];
+        const starGlyphs = ["⭐", "✨", "🖤"];
 
         function spawnStar() {
           if (ended) return;
@@ -3301,9 +3678,9 @@
           clearInterval(tickTimer);
           stage.querySelectorAll(".catcher-star").forEach((s) => s.remove());
           let msg;
-          if (score >= 18) msg = "Nezaustavljiva! 🌠";
-          else if (score >= 10) msg = "Odlično ulovljeno! ⭐";
-          else msg = "Lepo pokušano — probaj ponovo! ✨";
+          if (score >= 18) msg = "Kida 🌠";
+          else if (score >= 10) msg = "Nije lose ⭐";
+          else msg = "Nubara, probaj opet 💀";
           setTimeout(() => showGameResult(`Poeni: ${score}`, msg), 300);
         }
 
@@ -3513,11 +3890,7 @@
               solved = true;
               markGameComplete("puzzle");
               setTimeout(() => {
-                showGameResult(
-                  "Uspela si! 🧩🖤",
-                  "Cela slika, konačno.",
-                  PUZZLE_IMAGE,
-                );
+                showGameResult("Uspela si! 🧩🖤", "GOATED", PUZZLE_IMAGE);
               }, 700);
             }
           }
