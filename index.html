@@ -190,7 +190,6 @@
       .cta-button {
         position: relative;
         overflow: hidden;
-        pointer-events: auto;
         font-family: var(--body-font);
         font-weight: 600;
         font-size: 0.95rem;
@@ -653,50 +652,99 @@
         margin-top: 0.7rem;
       }
 
-      /* Quiz */
-      .quiz-progress {
-        font-size: 0.7rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin: 0 0 0.6rem;
+      /* Nahrani Simu */
+      .sima-stage {
+        position: relative;
+        height: 340px;
+        border-radius: 18px;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at 50% 10%,
+            rgba(203, 180, 255, 0.12),
+            transparent 60%
+          ),
+          rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(203, 180, 255, 0.25);
       }
-      .quiz-question {
-        font-family: var(--display-font);
-        font-style: italic;
-        font-size: 1.12rem;
-        margin: 0 0 1.1rem;
-        color: var(--text-soft);
-      }
-      .quiz-options {
-        display: flex;
-        flex-direction: column;
-        gap: 0.55rem;
-      }
-      .quiz-option {
-        padding: 0.72rem 1rem;
-        border-radius: 13px;
-        border: 1px solid rgba(203, 180, 255, 0.3);
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--text-soft);
-        text-align: left;
+      .sima-treat {
+        position: absolute;
+        font-size: 1.6rem;
         cursor: pointer;
-        font-family: var(--body-font);
-        font-size: 0.9rem;
-        transition:
-          background 0.25s ease,
-          border-color 0.25s ease;
+        user-select: none;
+        filter: drop-shadow(0 0 6px rgba(203, 180, 255, 0.55));
       }
-      .quiz-option:disabled {
-        cursor: default;
+      .sima-avatar-wrap {
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 96px;
+        height: 96px;
+        pointer-events: none;
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
-      .quiz-option.correct {
-        background: rgba(150, 255, 180, 0.16);
-        border-color: rgba(150, 255, 180, 0.5);
+      .sima-avatar-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        animation: simaFloat 3s ease-in-out infinite;
       }
-      .quiz-option.wrong {
-        background: rgba(255, 140, 140, 0.14);
-        border-color: rgba(255, 140, 140, 0.4);
+      .sima-avatar-wrap.bounce {
+        transform: translateX(-50%) scale(1.15) translateY(-8px);
+      }
+      @keyframes simaFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      .sima-hud {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.7rem;
+      }
+
+      /* Sima u svemiru — drag-to-dodge ship + comets */
+      .dodge-ship {
+        position: absolute;
+        bottom: 6px;
+        left: 0;
+        width: 64px;
+        height: 64px;
+        touch-action: none;
+        will-change: transform;
+      }
+      .dodge-ship img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        pointer-events: none;
+      }
+      .dodge-ship.hit img {
+        animation: dodgeHitFlash 0.35s ease;
+      }
+      @keyframes dodgeHitFlash {
+        0%,
+        100% {
+          filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        }
+        50% {
+          filter: brightness(1.9) drop-shadow(0 0 14px rgba(255, 90, 90, 0.9));
+        }
+      }
+      .dodge-comet {
+        position: absolute;
+        user-select: none;
+        pointer-events: none;
+        filter: drop-shadow(0 0 6px rgba(255, 150, 120, 0.55));
       }
 
       /* Shared result screen */
@@ -1215,7 +1263,7 @@
 
           <p class="subtext">
             Nismo imali priliku da napravimo mnogo velikih uspomena, ali smo
-            imali dosta malih trenutaka koji su mi značili. Zato sam napravio
+            imali neke trenutke koji su mi značili. Zato sam napravio
             ovo mesto gde mogu da ih sačuvam.
           </p>
 
@@ -1225,7 +1273,7 @@
 
       <section class="phase phase-2" data-phase="2">
         <div class="phase-inner">
-          <p class="eyebrow">Moj mali znak pažnje za tvoj rođendan.</p>
+          <p class="eyebrow">Mali poklon za veliki dan.</p>
           <!-- EDIT ME: mid-scroll line -->
           <h1 class="headline">
             Ponekad neko uđe u naš život na kratko, ali dovoljno da svakodnevicu
@@ -1237,9 +1285,9 @@
 
       <section class="phase phase-3" data-phase="3">
         <div class="phase-inner">
-          <p class="eyebrow">Sve ovo nije bilo nasumično.</p>
+          <p class="eyebrow">Ove zvezde nisu random ovde.</p>
           <!-- EDIT ME: transition line -->
-          <h1 class="headline">Samo je trebalo malo vremena da se složi.</h1>
+          <h1 class="headline">Žele da ti kažu nešto.</h1>
         </div>
       </section>
 
@@ -1280,11 +1328,13 @@
                 >
               </span>
             </button>
-            <button class="game-card" data-game="quiz" type="button">
-              <span class="game-card-icon">🖤</span>
+            <button class="game-card" data-game="sima" type="button">
+              <span class="game-card-icon">🛸</span>
               <span class="game-card-text">
-                <span class="game-card-title">Mini quiz</span>
-                <span class="game-card-desc">Mali kviz</span>
+                <span class="game-card-title">Sima u svemiru</span>
+                <span class="game-card-desc"
+                  >Pomogni simi da sleti</span
+                >
               </span>
             </button>
             <button class="game-card" data-game="puzzle" type="button">
@@ -1304,7 +1354,7 @@
             <p class="eyebrow">iznenađenje</p>
 
             <!-- <h1 class="headline">Negde se krije torta…</h1> -->
-            <p class="subtext">Odigraj sve četiri mini igre da je otključaš.</p>
+            <p class="subtext">Odigraj sve četri mini igre da je otključaš.</p>
             <div class="lock-container">
               <div class="lock-icon">🔒</div>
             </div>
@@ -1397,13 +1447,13 @@
         </button>
         <div class="letter-seal">🕯️</div>
         <p class="letter-heading">
-          26.8.2026. dan kad su nove zvezde prestale da sijaju
+          26.7.2026. dan kad su nove zvezde prestale da sijaju
         </p>
         <p class="letter-text">
           <!-- EDIT ME: napiši ovde svoje pismo za nju. Ostavi prazne linije
                (\n\n) tamo gde želiš pasus, tekst se prikazuje tačno kako je
                napisan. -->
-          Mozda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile daleko i sede nasmejane gledajuci u mnogo vece sazvedje
+          Mozda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile udaljene i sede nasmejane gledajuci u mnogo vece sazvezdje
         </p>
       </div>
     </div>
@@ -1520,6 +1570,57 @@
         "Ova zvezda pamti 30.01.2026.",
         "Ova zvezda pamti nasu kucu u minecraftu",
       ];
+
+      /* ---------- tooltip message assignment (stable per star) ----------
+         Each star gets ONE message, permanently, the first time it's ever
+         shown — after that, hovering/tapping it again always shows the
+         same text again, no matter how much time passes in between.
+         Messages are still handed out from a shared shuffled deck so that,
+         across DIFFERENT stars, all 13 messages get used once before any
+         repeat and two freshly-assigned stars in a row never collide. */
+      let messageQueue = [];
+      let lastShownMessage = null;
+
+      function shuffleMessages(arr) {
+        const copy = arr.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function refillMessageQueue() {
+        messageQueue = shuffleMessages(STAR_MESSAGES);
+        // guard the seam: don't let the last message of the old cycle
+        // immediately repeat as the first of the new cycle
+        if (messageQueue.length > 1 && messageQueue[0] === lastShownMessage) {
+          const swapIdx =
+            1 + Math.floor(Math.random() * (messageQueue.length - 1));
+          [messageQueue[0], messageQueue[swapIdx]] = [
+            messageQueue[swapIdx],
+            messageQueue[0],
+          ];
+        }
+      }
+
+      function nextTooltipMessage() {
+        if (messageQueue.length === 0) refillMessageQueue();
+        const msg = messageQueue.shift();
+        lastShownMessage = msg;
+        return msg;
+      }
+
+      // Draws a fresh message from the shared deck only the first time a
+      // given star is shown, then stores it on the star itself — every
+      // later hover/tap of that same star (this session, or any time in
+      // the future) returns exactly the same text.
+      function getMessageForStar(star) {
+        if (star.assignedMessage === null) {
+          star.assignedMessage = nextTooltipMessage();
+        }
+        return star.assignedMessage;
+      }
 
       const WISH_MESSAGES = [
         "Mala želja, posađena ✨",
@@ -2365,13 +2466,14 @@
           const driftScale = CONFIG.reducedMotion ? 0 : 0.055;
           this.vx = (Math.random() - 0.5) * driftScale;
           this.vy = (Math.random() - 0.5) * driftScale;
-          this.message =
-            STAR_MESSAGES[Math.floor(Math.random() * STAR_MESSAGES.length)];
           this.hue = Math.random() < 0.7 ? "pale" : "blue";
           // Each star gets its own point along the scroll where it begins
           // to fade in, so the field reveals itself gradually rather than
           // popping in all at once on load.
           this.appearThreshold = Math.random();
+          // Stable per-star tooltip text — assigned the first time this
+          // star is ever shown, then kept for the star's whole lifetime.
+          this.assignedMessage = null;
         }
       }
 
@@ -2407,7 +2509,6 @@
           star.isLetter = true;
           star.targetX = sortedTargets[i].x;
           star.targetY = sortedTargets[i].y;
-          star.message = STAR_MESSAGES[i % STAR_MESSAGES.length];
           // legibility floor: a letter star should never be too dim/small
           // to read, no matter how sparse its local neighborhood is
           star.radius = Math.max(star.radius, 1.35);
@@ -2530,7 +2631,6 @@
         star.vx = 0;
         star.vy = 0;
         star.radius = 1.6 + Math.random() * 0.8;
-        star.message = pick(STAR_MESSAGES);
         // planted by a direct tap/click, so it should shine right away
         // instead of waiting on the scroll-driven reveal window
         star.appearThreshold = 0;
@@ -2938,7 +3038,7 @@
       }
 
       function showTooltip(star) {
-        tooltip.textContent = star.message;
+        tooltip.textContent = getMessageForStar(star);
         tooltip.style.left = starDrawX(star) + "px";
         tooltip.style.top = star.y + "px";
         tooltip.classList.add("visible");
@@ -3090,7 +3190,7 @@
          one to blow it out (or blow them all at once), and the last
          flame going out triggers the final celebration.
          ========================================================= */
-      const GAME_KEYS = ["memory", "catcher", "quiz", "puzzle"];
+      const GAME_KEYS = ["memory", "catcher", "sima", "puzzle"];
       const CANDLE_COUNT = 19;
       let completedGames = new Set();
       let blownCandles = 0;
@@ -3449,7 +3549,7 @@
         currentGame = game;
         if (game === "memory") startMemoryGame();
         else if (game === "catcher") startCatcherGame();
-        else if (game === "quiz") startQuizGame();
+        else if (game === "sima") startSimaGame();
         else if (game === "puzzle") startPuzzleGame();
       }
 
@@ -3698,96 +3798,241 @@
         };
       }
 
-      // ---- Quiz ----
-      // EDIT ME: personalize these questions, options, and correct answers
-      const QUIZ_QUESTIONS = [
-        {
-          q: "Kada smo prvi put pričali?",
-          options: [
-            "U februaru",
-            "Na nečijem rođendanu",
-            "Slučajno",
-            "Ne sećam se, a trebalo bi",
-          ],
-          correct: 0,
-        },
-        {
-          q: "Šta najčešće radimo kasno uveče?",
-          options: [
-            "Igramo igrice",
-            "Pričamo gluposti",
-            "Oboje",
-            "Spavamo (retko)",
-          ],
-          correct: 2,
-        },
-        {
-          q: "Koja je moja omiljena fora da te nasmejem?",
-          options: [
-            "Loši vicevi",
-            "Glasovi",
-            "Ozbiljno lice pa iznenadna glupost",
-            "Sve gore navedeno",
-          ],
-          correct: 3,
-        },
-      ];
+      // ---- Sima u svemiru (dodge game) ----
+      // EDIT ME: path to her dog's spaceship photo — place the file at
+      // assets/sima.png next to this HTML file.
+      const SIMA_IMAGE = "assets/sima.png";
+      const SIMA_GAME_DURATION = 25; // seconds to survive
+      const SIMA_LIVES = 1;
 
-      function startQuizGame() {
-        let index = 0,
-          score = 0,
-          pendingTimeout = null;
+      function startSimaGame() {
+        gameContainer.innerHTML = `
+          <p class="game-title">Sima u svemiru 🛸</p>
+          <p class="game-subtitle">Izbegavaj komete. Preživi ${SIMA_GAME_DURATION} sekundi.</p>
+          <div class="sima-stage" id="dodgeStage">
+            <div class="dodge-ship" id="dodgeShip">
+              <img src="${SIMA_IMAGE}" alt="Sima" id="dodgeShipImg" />
+            </div>
+          </div>
+          <div class="sima-hud">
+            <span id="dodgeLives">🖤</span>
+            <span id="dodgeTime">Vreme: ${SIMA_GAME_DURATION}s</span>
+          </div>
+        `;
 
-        renderQuestion();
+        const stage = gameContainer.querySelector("#dodgeStage");
+        const ship = gameContainer.querySelector("#dodgeShip");
+        const shipImg = gameContainer.querySelector("#dodgeShipImg");
+        const livesEl = gameContainer.querySelector("#dodgeLives");
+        const timeEl = gameContainer.querySelector("#dodgeTime");
 
-        function renderQuestion() {
-          const item = QUIZ_QUESTIONS[index];
-          gameContainer.innerHTML = `
-            <p class="game-title">Koliko me poznaješ? 💜</p>
-            <p class="quiz-progress">Pitanje ${index + 1} od ${QUIZ_QUESTIONS.length}</p>
-            <p class="quiz-question">${item.q}</p>
-            <div class="quiz-options" id="quizOptions"></div>
-          `;
-          const optionsEl = gameContainer.querySelector("#quizOptions");
-          item.options.forEach((opt, i) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "quiz-option";
-            btn.textContent = opt;
-            btn.addEventListener("click", () => {
-              if (btn.disabled) return;
-              optionsEl
-                .querySelectorAll(".quiz-option")
-                .forEach((o) => (o.disabled = true));
-              if (i === item.correct) {
-                btn.classList.add("correct");
-                score++;
-              } else {
-                btn.classList.add("wrong");
-                optionsEl.children[item.correct].classList.add("correct");
-              }
-              pendingTimeout = setTimeout(() => {
-                index++;
-                if (index < QUIZ_QUESTIONS.length) {
-                  renderQuestion();
-                } else {
-                  const pct = Math.round((score / QUIZ_QUESTIONS.length) * 100);
-                  let msg;
-                  if (pct === 100) msg = "Znaš me bolje nego što mislim. 🖤";
-                  else if (pct >= 60)
-                    msg = "Solidno! Imamo o čemu da pričamo. 😄";
-                  else msg = "Hajde, moramo više da pričamo. 😉";
-                  markGameComplete("quiz");
-                  showGameResult(`${score}/${QUIZ_QUESTIONS.length}`, msg);
-                }
-              }, 900);
-            });
-            optionsEl.appendChild(btn);
+        shipImg.addEventListener("error", () => {
+          ship.innerHTML = "🛸";
+          ship.style.display = "flex";
+          ship.style.alignItems = "center";
+          ship.style.justifyContent = "center";
+          ship.style.fontSize = "2.4rem";
+        });
+
+        let ended = false;
+        let lives = SIMA_LIVES;
+        let timeLeft = SIMA_GAME_DURATION;
+        let shipXFrac = 0.5; // 0..1 across the usable stage width
+        const shipSize = 64;
+        let comets = [];
+        let lastSpawn = 0;
+        let spawnInterval = 950; // ms between spawns, ramps up over time
+        let rafId = null;
+        let tickTimer = null;
+        let invulnerableUntil = 0;
+        let dragging = false;
+        let loopLast = null;
+
+        function getStageRect() {
+          return stage.getBoundingClientRect();
+        }
+
+        function updateShipPosition() {
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const x = clamp(shipXFrac, 0, 1) * usableWidth;
+          ship.style.transform = `translateX(${x}px)`;
+        }
+
+        function setShipXFromClientX(clientX) {
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const relX = clientX - rect.left - shipSize / 2;
+          shipXFrac = clamp(relX / usableWidth, 0, 1);
+          updateShipPosition();
+        }
+
+        function onPointerDown(e) {
+          if (ended) return;
+          dragging = true;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setShipXFromClientX(clientX);
+        }
+        function onPointerMove(e) {
+          if (!dragging || ended) return;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setShipXFromClientX(clientX);
+          if (e.cancelable) e.preventDefault();
+        }
+        function onPointerUp() {
+          dragging = false;
+        }
+
+        stage.addEventListener("mousedown", onPointerDown);
+        window.addEventListener("mousemove", onPointerMove);
+        window.addEventListener("mouseup", onPointerUp);
+        stage.addEventListener("touchstart", onPointerDown, { passive: true });
+        stage.addEventListener("touchmove", onPointerMove, { passive: false });
+        stage.addEventListener("touchend", onPointerUp);
+
+        const cometGlyphs = ["☄️", "🪨", "🌑"];
+
+        function spawnComet() {
+          const rect = getStageRect();
+          const size = 26 + Math.random() * 16;
+          const el = document.createElement("span");
+          el.className = "dodge-comet";
+          el.textContent =
+            cometGlyphs[Math.floor(Math.random() * cometGlyphs.length)];
+          el.style.fontSize = size + "px";
+          const x = Math.random() * Math.max(1, rect.width - size);
+          el.style.left = x + "px";
+          el.style.top = "-40px";
+          stage.appendChild(el);
+          comets.push({
+            el,
+            x,
+            y: -40,
+            size,
+            speed:
+              90 + Math.random() * 55 + (SIMA_GAME_DURATION - timeLeft) * 3.2,
           });
         }
 
+        function updateLivesUI() {
+          livesEl.textContent =
+            "🖤".repeat(lives) + "🤍".repeat(Math.max(0, SIMA_LIVES - lives));
+        }
+        updateLivesUI();
+        updateShipPosition();
+
+        function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+          return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+        }
+
+        function registerHit() {
+          lives--;
+          updateLivesUI();
+          invulnerableUntil = performance.now() + 1000;
+          ship.classList.add("hit");
+          setTimeout(() => ship.classList.remove("hit"), 350);
+          const shipRect = ship.getBoundingClientRect();
+          spawnBurst(
+            shipRect.left + shipRect.width / 2,
+            shipRect.top + shipRect.height / 2,
+            "255,120,120",
+            14,
+          );
+          if (lives <= 0) endDodgeGame(false);
+        }
+
+        function endDodgeGame(survived) {
+          if (ended) return;
+          ended = true;
+          markGameComplete("sima");
+          cancelAnimationFrame(rafId);
+          clearInterval(tickTimer);
+          comets.forEach((c) => c.el.remove());
+          comets = [];
+          let title, msg;
+          if (survived) {
+            title = "Preživeli ste! 🛸";
+            msg = "Sima je uspešno sleteo nazad na Zemlju 🐾";
+          } else {
+            title = "Kometa je pogodila Simu!";
+            msg = "R.I.P Sima";
+          }
+          setTimeout(() => showGameResult(title, msg, SIMA_IMAGE), 300);
+        }
+
+        function loop(ts) {
+          if (ended) return;
+          if (loopLast === null) loopLast = ts;
+          const dt = Math.min(0.05, (ts - loopLast) / 1000);
+          loopLast = ts;
+
+          if (ts - lastSpawn > spawnInterval) {
+            spawnComet();
+            lastSpawn = ts;
+            spawnInterval = Math.max(420, spawnInterval - 6);
+          }
+
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const shipHitbox = {
+            x: clamp(shipXFrac, 0, 1) * usableWidth + 10,
+            y: rect.height - shipSize + 6,
+            w: shipSize - 20,
+            h: shipSize - 24,
+          };
+
+          for (let i = comets.length - 1; i >= 0; i--) {
+            const c = comets[i];
+            c.y += c.speed * dt;
+            c.el.style.top = c.y + "px";
+
+            if (c.y > rect.height + 40) {
+              c.el.remove();
+              comets.splice(i, 1);
+              continue;
+            }
+
+            if (
+              ts > invulnerableUntil &&
+              rectsOverlap(
+                shipHitbox.x,
+                shipHitbox.y,
+                shipHitbox.w,
+                shipHitbox.h,
+                c.x + 5,
+                c.y + 5,
+                c.size - 10,
+                c.size - 10,
+              )
+            ) {
+              c.el.remove();
+              comets.splice(i, 1);
+              registerHit();
+            }
+          }
+
+          rafId = requestAnimationFrame(loop);
+        }
+
+        tickTimer = setInterval(() => {
+          if (ended) return;
+          timeLeft--;
+          timeEl.textContent = `Vreme: ${timeLeft}s`;
+          if (timeLeft <= 0) endDodgeGame(true);
+        }, 1000);
+
+        rafId = requestAnimationFrame(loop);
+
         activeGameCleanup = () => {
-          if (pendingTimeout) clearTimeout(pendingTimeout);
+          ended = true;
+          cancelAnimationFrame(rafId);
+          clearInterval(tickTimer);
+          stage.removeEventListener("mousedown", onPointerDown);
+          window.removeEventListener("mousemove", onPointerMove);
+          window.removeEventListener("mouseup", onPointerUp);
+          stage.removeEventListener("touchstart", onPointerDown);
+          stage.removeEventListener("touchmove", onPointerMove);
+          stage.removeEventListener("touchend", onPointerUp);
         };
       }
 
