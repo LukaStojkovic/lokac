@@ -7,13 +7,37 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>Za Lolu — Mali Univerzum</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Za Lolu — Mali Univerzum" />
+    <meta
+      property="og:description"
+      content="Mali univerzum napravljen samo za tebe. Otvori i skroluj ↓"
+    />
+    <meta
+      property="og:image"
+      content="/assets/icon.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Za Lolu — Mali Univerzum" />
+    <meta
+      name="twitter:description"
+      content="Mali univerzum napravljen samo za tebe. Otvori i skroluj ↓"
+    />
+    <meta
+      name="twitter:image"
+      content="/assets/icon.png"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="icon" type="image/png" href="/assets/icon.png" />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Quicksand:wght@300;400;500;600&family=Poppins:wght@800;900&display=swap"
       rel="stylesheet"
     />
 
-    <!-- Three.js via ES module import map. No build step needed. -->
     <script type="importmap">
       {
         "imports": {
@@ -21,6 +45,9 @@
         }
       }
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
 
     <style>
       :root {
@@ -40,7 +67,10 @@
       * {
         box-sizing: border-box;
       }
-
+#sendLetterButton {
+  white-space: nowrap;
+  font-size: 0.88rem;   /* malo manji da lakše stane u jedan red */
+}
       html,
       body {
         margin: 0;
@@ -111,8 +141,28 @@
         font-size: clamp(1.6rem, 4.6vw, 2.9rem);
         line-height: 1.25;
         margin: 0 0 0.9rem;
-        color: var(--text-soft);
         text-shadow: 0 0 26px rgba(203, 180, 255, 0.35);
+        background: linear-gradient(
+          100deg,
+          var(--text-soft) 0%,
+          var(--accent-glow) 22%,
+          var(--accent-gold) 40%,
+          var(--text-soft) 58%,
+          var(--star-blue) 76%,
+          var(--text-soft) 100%
+        );
+        background-size: 260% auto;
+        background-position: 0% center;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        animation: shimmerText 9s linear infinite;
+      }
+      @keyframes shimmerText {
+        to {
+          background-position: -260% center;
+        }
       }
 
       .subtext {
@@ -161,7 +211,8 @@
       }
 
       .cta-button {
-        pointer-events: auto;
+        position: relative;
+        overflow: hidden;
         font-family: var(--body-font);
         font-weight: 600;
         font-size: 0.95rem;
@@ -181,6 +232,26 @@
           transform 0.25s ease,
           box-shadow 0.35s ease;
       }
+      .cta-button::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 45%;
+        height: 100%;
+        background: linear-gradient(
+          115deg,
+          transparent,
+          rgba(255, 255, 255, 0.65),
+          transparent
+        );
+        transform: skewX(-22deg);
+        transition: left 0.75s ease;
+        pointer-events: none;
+      }
+      .cta-button:hover::before {
+        left: 130%;
+      }
       .cta-button:hover {
         transform: translateY(-2px) scale(1.02);
         box-shadow: 0 8px 30px rgba(203, 180, 255, 0.45);
@@ -197,6 +268,79 @@
         color: var(--text-muted);
         animation: floatCue 2.6s ease-in-out infinite;
       }
+      .story-progress {
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .story-progress.visible {
+        opacity: 1;
+      }
+      .story-progress::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 5px;
+        bottom: 5px;
+        width: 1px;
+        background: rgba(238, 241, 255, 0.15);
+        transform: translateX(-50%);
+        z-index: -1;
+      }
+      .story-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(238, 241, 255, 0.28);
+        border: 1px solid rgba(238, 241, 255, 0.3);
+        transition:
+          background 0.4s ease,
+          transform 0.4s ease,
+          box-shadow 0.4s ease,
+          border-color 0.4s ease;
+      }
+      .story-dot.filled {
+        background: var(--accent-glow);
+        border-color: var(--accent-glow);
+      }
+      .story-dot.active {
+        transform: scale(1.5);
+        background: var(--star-pale);
+        border-color: var(--star-pale);
+        box-shadow: 0 0 10px rgba(203, 180, 255, 0.75);
+      }
+
+      @media (max-width: 640px) {
+        .story-progress {
+          right: 14px;
+          gap: 11px;
+        }
+        .story-dot {
+          width: 6px;
+          height: 6px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .story-dot {
+          transition:
+            background 0.2s linear,
+            border-color 0.2s linear;
+        }
+        .story-dot.active {
+          transform: none;
+        }
+      }
+
       @keyframes floatCue {
         0%,
         100% {
@@ -296,15 +440,36 @@
           transition: opacity 0.4s linear;
           transform: none !important;
         }
+        .headline {
+          animation: none;
+          background-position: 0% center;
+        }
+        .game-card,
+        .candle {
+          animation: none !important;
+          opacity: 1 !important;
+          transform: none !important;
+        }
+        .cta-button::before {
+          display: none;
+        }
       }
 
-      /* ---------- Mini-games section ---------- */
       .phase-games {
         min-height: 100vh;
         padding-bottom: 14vh;
       }
-      .games-inner {
+      .games-inner,
+      .cake-inner {
         max-width: 480px;
+        background: rgba(5, 6, 26, 0.55);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(203, 180, 255, 0.18);
+        border-radius: 28px;
+        padding: 2.2rem 1.6rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+        pointer-events: auto;
       }
       .game-picker {
         display: flex;
@@ -313,6 +478,8 @@
         margin-top: 1.8rem;
       }
       .game-card {
+        position: relative;
+        overflow: hidden;
         pointer-events: auto;
         display: flex;
         align-items: center;
@@ -325,15 +492,56 @@
         color: var(--text-soft);
         cursor: pointer;
         font-family: var(--body-font);
+        opacity: 0;
+        transform: translateY(16px);
         transition:
-          transform 0.25s ease,
+          transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+          opacity 0.6s ease,
           background 0.25s ease,
           box-shadow 0.3s ease;
+        transition-delay: 0s, 0s, 0s, 0s;
+      }
+      .game-card::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -80%;
+        width: 40%;
+        height: 100%;
+        background: linear-gradient(
+          115deg,
+          transparent,
+          rgba(255, 255, 255, 0.16),
+          transparent
+        );
+        transform: skewX(-22deg);
+        transition: left 0.7s ease;
+        pointer-events: none;
+      }
+      .game-card:hover::after {
+        left: 130%;
+      }
+      .phase-inner.visible .game-card {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .phase-inner.visible .game-card:nth-child(1) {
+        transition-delay: 0.05s;
+      }
+      .phase-inner.visible .game-card:nth-child(2) {
+        transition-delay: 0.16s;
+      }
+      .phase-inner.visible .game-card:nth-child(3) {
+        transition-delay: 0.27s;
+      }
+      .phase-inner.visible .game-card:nth-child(4) {
+        transition-delay: 0.38s;
       }
       .game-card:hover {
         transform: translateY(-2px);
         background: rgba(255, 255, 255, 0.08);
         box-shadow: 0 10px 26px rgba(203, 180, 255, 0.18);
+        transition-delay: 0s;
       }
       .game-card:active {
         transform: translateY(0) scale(0.99);
@@ -342,6 +550,18 @@
         font-size: 1.7rem;
         flex-shrink: 0;
         filter: drop-shadow(0 0 8px rgba(203, 180, 255, 0.45));
+      }
+      .game-card-icon-img {
+          width: 2.5rem;
+          height: 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .game-card-icon-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
       }
       .game-card-text {
         display: flex;
@@ -358,7 +578,6 @@
         line-height: 1.4;
       }
 
-      /* ---------- Game overlay ---------- */
       .game-overlay {
         position: fixed;
         inset: 0;
@@ -400,6 +619,37 @@
       .game-overlay.visible .game-panel {
         transform: translateY(0) scale(1);
       }
+
+      .lock-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.2rem;
+      }
+
+      .lock-icon {
+        font-size: 4rem;
+        filter: drop-shadow(0 0 18px rgba(203, 180, 255, 0.5));
+        animation: lockFloat 2.5s ease-in-out infinite;
+        transition:
+          transform 0.5s ease,
+          opacity 0.5s ease;
+      }
+
+      @keyframes lockFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .phase-cake.unlocked .lock-icon {
+        transform: scale(0) rotate(30deg);
+        opacity: 0;
+      }
       .game-close {
         position: absolute;
         top: 12px;
@@ -429,7 +679,6 @@
         line-height: 1.5;
       }
 
-      /* Memory game */
       .memory-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -477,7 +726,6 @@
         text-align: center;
       }
 
-      /* Star catcher */
       .catcher-stage {
         position: relative;
         height: 320px;
@@ -507,53 +755,99 @@
         margin-top: 0.7rem;
       }
 
-      /* Quiz */
-      .quiz-progress {
-        font-size: 0.7rem;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-        margin: 0 0 0.6rem;
+      .sima-stage {
+        position: relative;
+        height: 340px;
+        border-radius: 18px;
+        overflow: hidden;
+        background:
+          radial-gradient(
+            circle at 50% 10%,
+            rgba(203, 180, 255, 0.12),
+            transparent 60%
+          ),
+          rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(203, 180, 255, 0.25);
       }
-      .quiz-question {
-        font-family: var(--display-font);
-        font-style: italic;
-        font-size: 1.12rem;
-        margin: 0 0 1.1rem;
-        color: var(--text-soft);
-      }
-      .quiz-options {
-        display: flex;
-        flex-direction: column;
-        gap: 0.55rem;
-      }
-      .quiz-option {
-        padding: 0.72rem 1rem;
-        border-radius: 13px;
-        border: 1px solid rgba(203, 180, 255, 0.3);
-        background: rgba(255, 255, 255, 0.04);
-        color: var(--text-soft);
-        text-align: left;
+      .sima-treat {
+        position: absolute;
+        font-size: 1.6rem;
         cursor: pointer;
-        font-family: var(--body-font);
-        font-size: 0.9rem;
-        transition:
-          background 0.25s ease,
-          border-color 0.25s ease;
+        user-select: none;
+        filter: drop-shadow(0 0 6px rgba(203, 180, 255, 0.55));
       }
-      .quiz-option:disabled {
-        cursor: default;
+      .sima-avatar-wrap {
+        position: absolute;
+        bottom: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 96px;
+        height: 96px;
+        pointer-events: none;
+        transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
       }
-      .quiz-option.correct {
-        background: rgba(150, 255, 180, 0.16);
-        border-color: rgba(150, 255, 180, 0.5);
+      .sima-avatar-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        animation: simaFloat 3s ease-in-out infinite;
       }
-      .quiz-option.wrong {
-        background: rgba(255, 140, 140, 0.14);
-        border-color: rgba(255, 140, 140, 0.4);
+      .sima-avatar-wrap.bounce {
+        transform: translateX(-50%) scale(1.15) translateY(-8px);
+      }
+      @keyframes simaFloat {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      .sima-hud {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        margin-top: 0.7rem;
       }
 
-      /* Shared result screen */
+      .dodge-ship {
+        position: absolute;
+        bottom: 6px;
+        left: 0;
+        width: 64px;
+        height: 64px;
+        touch-action: none;
+        will-change: transform;
+      }
+      .dodge-ship img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        pointer-events: none;
+      }
+      .dodge-ship.hit img {
+        animation: dodgeHitFlash 0.35s ease;
+      }
+      @keyframes dodgeHitFlash {
+        0%,
+        100% {
+          filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.4));
+        }
+        50% {
+          filter: brightness(1.9) drop-shadow(0 0 14px rgba(255, 90, 90, 0.9));
+        }
+      }
+      .dodge-comet {
+        position: absolute;
+        user-select: none;
+        pointer-events: none;
+        filter: drop-shadow(0 0 6px rgba(255, 150, 120, 0.55));
+      }
+
       .game-result {
         text-align: center;
         padding-top: 0.6rem;
@@ -602,7 +896,6 @@
         border: 1px solid rgba(203, 180, 255, 0.35);
         box-shadow: none !important;
       }
-      /* Photo puzzle */
       .puzzle-wrap {
         display: flex;
         flex-direction: column;
@@ -646,23 +939,489 @@
         background: rgba(255, 255, 255, 0.08);
         font-size: 0.78rem;
       }
+
+      .cake-inner {
+        max-width: 520px;
+      }
+      .cake-locked {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .cake-progress {
+        margin-top: 1.4rem;
+        font-family: var(--body-font);
+        font-size: 0.82rem;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        padding: 0.5rem 1.1rem;
+        border: 1px solid rgba(203, 180, 255, 0.3);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .cake-unlocked {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        pointer-events: auto;
+      }
+      .phase-cake.unlocked .cake-locked {
+        display: none;
+      }
+      .phase-cake.unlocked .cake-unlocked {
+        display: flex;
+      }
+
+.cake-scene {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  margin: 3.2rem auto 0.6rem;
+}
+
+.candle-row {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
+  width: 54%;
+  max-width: 176px;
+  z-index: 5;
+  padding: 0;
+}
+     .candle {
+  position: relative;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 2px;
+  max-width: 6px;
+  height: 26px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #fff2df, #e7c98f);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(10px) scale(0.7);
+  animation: candlePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+      @keyframes candlePop {
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+      .candle-flame {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(
+    circle at 50% 70%,
+    #fff6d8 0%,
+    var(--accent-gold) 45%,
+    rgba(255, 150, 90, 0.9) 80%,
+    rgba(255, 100, 60, 0) 100%
+  );
+  filter: drop-shadow(0 0 5px rgba(255, 210, 140, 0.85));
+  animation: flameFlicker 1.6s ease-in-out infinite;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+      @keyframes flameFlicker {
+        0%,
+        100% {
+          transform: translateX(-50%) scale(1) rotate(-1deg);
+        }
+        30% {
+          transform: translateX(-50%) scale(1.06, 0.94) rotate(2deg);
+        }
+        60% {
+          transform: translateX(-45%) scale(0.94, 1.05) rotate(-2deg);
+        }
+      }
+      .candle.blown .candle-flame {
+        opacity: 0;
+        transform: translateX(-50%) translateY(6px) scale(0.4);
+        animation: none;
+      }
+.candle-smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(220, 220, 230, 0.6);
+  opacity: 0;
+  pointer-events: none;
+}
+      .candle.blown .candle-smoke {
+        animation: smokeRise 0.9s ease-out forwards;
+      }
+      @keyframes smokeRise {
+        0% {
+          opacity: 0.6;
+          transform: translate(-50%, 0) scale(1);
+        }
+        100% {
+          opacity: 0;
+          transform: translate(-50%, -22px) scale(3.2);
+        }
+      }
+
+.cake-body {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
+
+
+.cake-tier {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.5),
+    inset 0 -14px 20px rgba(90, 50, 140, 0.28),
+    inset 8px 0 16px rgba(255, 255, 255, 0.12),
+    inset -8px 0 16px rgba(0, 0, 0, 0.15),
+    0 12px 20px rgba(0, 0, 0, 0.35);
+}
+
+
+.cake-tier::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -2px;
+  right: -2px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.85);
+  clip-path: polygon(
+    0% 40%, 4% 65%, 9% 35%, 14% 68%, 19% 30%, 24% 62%,
+    29% 32%, 34% 70%, 39% 28%, 44% 65%, 49% 35%,
+    54% 68%, 59% 30%, 64% 64%, 69% 33%, 74% 70%,
+    79% 28%, 84% 66%, 89% 32%, 94% 68%, 100% 40%,
+    100% 100%, 0% 100%
+  );
+  border-radius: 8px 8px 0 0;
+  filter: drop-shadow(0 -1px 2px rgba(120, 80, 40, 0.15));
+}
+
+.cake-tier-top {
+  width: 56%;
+  height: 44px;
+  margin-bottom: -4px;
+  z-index: 3;
+  background: linear-gradient(180deg, #fbf1ff 0%, #e8d4ff 35%, var(--accent-glow) 100%);
+}
+.cake-tier-top::after {
+  content: "";
+  position: absolute;
+  inset: 10px 8px 5px;
+  border-radius: 6px;
+  background-image:
+    radial-gradient(circle, #ffe3b0 3px, transparent 3.2px),
+    radial-gradient(circle, #b9c8ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffc8d6 3px, transparent 3.2px),
+    radial-gradient(circle, #eef1ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffe3b0 3px, transparent 3.2px),
+    radial-gradient(circle, #b9c8ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffc8d6 3px, transparent 3.2px);
+  background-size: 16.6% 100%;
+  background-repeat: no-repeat;
+  background-position:
+    4% 25%, 18% 70%, 32% 15%, 46% 65%, 60% 20%, 74% 68%, 90% 30%;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.cake-tier-mid {
+  width: 70%;
+  height: 50px;
+  margin-bottom: -4px;
+  z-index: 2;
+  background: linear-gradient(180deg, #fff3e5 0%, #ffdcb8 35%, #ffcfa3 100%);
+}
+.cake-tier-bottom {
+  width: 84%;
+  height: 58px;
+  z-index: 1;
+  background: linear-gradient(180deg, #fff0d4 0%, #ffe0a8 35%, var(--accent-gold) 100%);
+}
+
+.cake-plate {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(238, 241, 255, 0.35), rgba(238, 241, 255, 0.08));
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.15) inset,
+    0 18px 30px 4px rgba(0, 0, 0, 0.45);
+  margin-top: 6px;
+}
+.cake-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.25), transparent 70%);
+}
+      .cake-counter {
+        margin-top: 1.1rem;
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.05rem;
+        color: var(--text-soft);
+      }
+
+      #blowAllButton {
+        margin-top: 1rem;
+      }
+
+      .cake-celebration {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.6rem;
+  animation: resultImageReveal 0.7s ease both;
+}
+
+      .cake-unlocked.all-blown .cake-scene,
+      .cake-unlocked.all-blown .cake-counter,
+      .cake-unlocked.all-blown #blowAllButton,
+      .cake-unlocked.all-blown #cakeInstructions,
+      .cake-unlocked.all-blown #cakeHeadline {
+        display: none;
+      }
+      .cake-unlocked.all-blown .cake-celebration {
+        display: flex;
+      }
+      .cake-celebration .subtext {
+  margin-bottom: 2.4rem;   /* bio 1.3rem — veći razmak pre dugmadi */
+}
+     .cake-celebration .cta-button {
+  margin-top: 0;            /* prvo dugme ne treba dodatni top-margin, subtext ga već razdvaja */
+  width: 100%;
+  max-width: 280px;         /* opciono — da dugmad ne budu preširoka na desktopu */
+}
+     .cake-celebration .cta-button + .cta-button {
+  margin-top: 1.1rem;       /* bilo 0.7rem — veći razmak između samih dugmadi */
+}
+
+      .confetti-piece {
+        position: fixed;
+        top: -24px;
+        width: 8px;
+        height: 14px;
+        pointer-events: none;
+        z-index: 15;
+        opacity: 0.95;
+        will-change: transform, opacity;
+        animation-name: confettiFall;
+        animation-timing-function: cubic-bezier(0.36, 0.2, 0.6, 1);
+        animation-fill-mode: forwards;
+      }
+      @keyframes confettiFall {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+          opacity: 1;
+        }
+        85% {
+          opacity: 0.95;
+        }
+        100% {
+          transform: translate(var(--drift, 0px), 108vh) rotate(600deg);
+          opacity: 0;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .confetti-piece {
+          display: none;
+        }
+      }
+
+      .letter-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 25;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(5, 6, 26, 0.62);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+      }
+      .letter-overlay.visible {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .letter-paper {
+        position: relative;
+        width: min(92vw, 460px);
+        max-height: 84vh;
+        overflow-y: auto;
+        padding: 2.4rem 2rem 2rem;
+        border-radius: 6px;
+        color: #3d2b1f;
+        background:
+          radial-gradient(
+            circle at 12% 8%,
+            rgba(150, 105, 60, 0.14),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 88% 92%,
+            rgba(150, 105, 60, 0.16),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at 70% 15%,
+            rgba(150, 105, 60, 0.08),
+            transparent 35%
+          ),
+          linear-gradient(160deg, #f3e3c4 0%, #e8d3a5 55%, #ecd9ae 100%);
+        box-shadow:
+          0 26px 70px rgba(0, 0, 0, 0.55),
+          inset 0 0 0 1px rgba(120, 82, 40, 0.25),
+          inset 0 0 40px rgba(120, 82, 40, 0.12);
+        transform: rotate(-0.6deg) translateY(10px) scale(0.97);
+        opacity: 0;
+        transition:
+          transform 0.35s ease,
+          opacity 0.35s ease;
+      }
+      .letter-overlay.visible .letter-paper {
+        transform: rotate(-0.6deg) translateY(0) scale(1);
+        opacity: 1;
+      }
+      .letter-paper::before {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        border: 1px dashed rgba(120, 82, 40, 0.3);
+        border-radius: 3px;
+        pointer-events: none;
+      }
+      .letter-seal {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0.6rem;
+        font-size: 1.6rem;
+        filter: drop-shadow(0 2px 4px rgba(120, 82, 40, 0.35));
+      }
+      .letter-heading {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-weight: 600;
+        font-size: 1.35rem;
+        text-align: center;
+        margin: 0 0 1.2rem;
+        color: #5a3d24;
+      }
+      .letter-text {
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1.08rem;
+        line-height: 1.85;
+        color: #3d2b1f;
+        white-space: pre-line;
+      }
+      .letter-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid rgba(120, 82, 40, 0.35);
+        background: rgba(120, 82, 40, 0.08);
+        color: #5a3d24;
+        font-size: 1rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+      .letter-label {
+        display: block;
+        font-family: var(--body-font);
+        font-weight: 600;
+        font-size: 0.76rem;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #6b4c2e;
+        margin: 1rem 0 0.4rem;
+      }
+      .letter-input,
+      .letter-textarea {
+        width: 100%;
+        font-family: var(--display-font);
+        font-style: italic;
+        font-size: 1rem;
+        color: #3d2b1f;
+        background: rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(120, 82, 40, 0.3);
+        border-radius: 8px;
+        padding: 0.6rem 0.75rem;
+        resize: vertical;
+      }
+      .letter-input:focus,
+      .letter-textarea:focus {
+        outline: none;
+        border-color: rgba(120, 82, 40, 0.6);
+      }
+      .letter-form .cta-button {
+        margin-top: 1.3rem;
+        width: 100%;
+        background: linear-gradient(135deg, #f3e3c4, #cbb4ff);
+      }
+      .letter-status {
+        text-align: center;
+        font-size: 0.82rem;
+        color: #6b4c2e;
+        margin: 0.7rem 0 0;
+        min-height: 1.1em;
+      }
     </style>
   </head>
   <body>
-    <!-- Three.js renderer canvas gets mounted inside this div -->
     <div id="sky" aria-hidden="true"></div>
     <div id="tooltip" role="status"></div>
     <div id="wishToast" role="status"></div>
-
+    <nav class="story-progress" id="storyProgress" aria-hidden="true">
+      <span class="story-dot" data-phase="1"></span>
+      <span class="story-dot" data-phase="2"></span>
+      <span class="story-dot" data-phase="3"></span>
+      <span class="story-dot" data-phase="4"></span>
+    </nav>
     <main>
       <section class="phase phase-1" data-phase="1">
         <div class="phase-inner">
-          <p class="eyebrow">mali univerzum, za tebe</p>
+          <p class="eyebrow">mali univerzum</p>
 
-          <h1 class="headline">Dobrodošla u moj mali univerzum za tebe…</h1>
+          <h1 class="headline">Dobrodošla u mali univerzum za tebe…</h1>
 
           <p class="subtext">
-            Svaka zvezda ovde pamti nešto. Nastavi da skroluješ.
+            Nismo imali priliku da napravimo mnogo velikih uspomena, ali smo
+            imali neke trenutke koji su mi značili. Zato sam napravio ovo mesto
+            gde mogu da ih sačuvam.
           </p>
 
           <div class="scroll-cue">skroluj ↓</div>
@@ -671,11 +1430,10 @@
 
       <section class="phase phase-2" data-phase="2">
         <div class="phase-inner">
-          <p class="eyebrow">negde između februara i sada</p>
-          <!-- EDIT ME: mid-scroll line -->
+          <p class="eyebrow">Mali poklon za veliki dan.</p>
           <h1 class="headline">
-            Svaka kasna noć, svaka glupa šala, svako "još jedna igra" — sve je
-            još uvek ovde.
+            Ponekad neko uđe u naš život na kratko, ali dovoljno da svakodnevicu
+            učini lepšom.
           </h1>
           <p class="subtext">Pređi preko zvezde. Reći će ti nešto.</p>
         </div>
@@ -683,30 +1441,26 @@
 
       <section class="phase phase-3" data-phase="3">
         <div class="phase-inner">
-          <p class="eyebrow">pažljivo gledaj</p>
-          <!-- EDIT ME: transition line -->
-          <h1 class="headline">Više ne lutaju. One ispisuju nešto.</h1>
+          <p class="eyebrow">Ove zvezde nisu random ovde.</p>
+          <h1 class="headline">Sve zvezde su povezane.</h1>
         </div>
       </section>
 
       <section class="phase phase-4" data-phase="4">
-        <h2 class="sr-only-heading">Srecan rodjedan Lola</h2>
+        <h2 class="sr-only-heading">Srećan rodjedan Lola</h2>
         <div class="phase-inner">
-          <!-- EDIT ME: closing note -->
           <p class="final-note">
             Srećan rođendan, Lola.<br />
-            Za sve galaksije koje još nismo istražili.
+            <span class="subtext"
+              >Nadam se da će ti ovaj mali univerzum izmamiti osmeh, kao što si
+              ti meni mnogo puta.</span
+            >
           </p>
-
-          <button class="cta-button" id="wishButton" type="button">
-            Zamisli zelju 🖤
-          </button>
         </div>
       </section>
 
       <section class="phase phase-games" data-phase="5">
-        <div class="phase-inner games-inner">
-          <!-- <p class="eyebrow">bonus za rođendan</p> -->
+        <div class="phase-inner games-inner ui-surface">
           <h1 class="headline">Mini igre</h1>
           <p class="subtext">Izaberi igru</p>
 
@@ -727,13 +1481,15 @@
                 >
               </span>
             </button>
-            <button class="game-card" data-game="quiz" type="button">
-              <span class="game-card-icon">🖤</span>
-              <span class="game-card-text">
-                <span class="game-card-title">Mini quiz</span>
-                <span class="game-card-desc">Mali kviz</span>
-              </span>
-            </button>
+           <button class="game-card" data-game="sima" type="button">
+  <span class="game-card-icon game-card-icon-img">
+    <img src="assets/sima.png" alt="" />
+  </span>
+  <span class="game-card-text">
+    <span class="game-card-title">Sima in space</span>
+    <span class="game-card-desc">Pomogni simi da sleti</span>
+  </span>
+</button>
             <button class="game-card" data-game="puzzle" type="button">
               <span class="game-card-icon">🧩</span>
               <span class="game-card-text">
@@ -744,9 +1500,72 @@
           </div>
         </div>
       </section>
+
+      <section class="phase phase-cake" data-phase="6" id="cakePhase">
+        <div class="phase-inner cake-inner ui-surface">
+          <div class="cake-locked" id="cakeLocked">
+            <p class="eyebrow">iznenađenje</p>
+
+            <p class="subtext">Odigraj sve četri mini igre da je otključaš.</p>
+            <div class="lock-container">
+              <div class="lock-icon">🔒</div>
+            </div>
+            <p class="cake-progress" id="cakeProgress">0 / 4 igre odigrane</p>
+          </div>
+
+          <div class="cake-unlocked" id="cakeUnlocked">
+            <h1 class="headline" id="cakeHeadline">
+              Zamisli želju i duni svećice
+            </h1>
+
+            <div class="cake-scene" id="cakeScene">
+              <div class="candle-row" id="candleRow"></div>
+              <div class="cake-body">
+  <div class="cake-tier cake-tier-top"></div>
+  <div class="cake-tier cake-tier-mid"></div>
+  <div class="cake-tier cake-tier-bottom"></div>
+  <div class="cake-plate"></div>
+</div>
+            </div>
+
+            <p class="cake-counter" id="cakeCounter">19 svećica čeka</p>
+            <button
+              class="cta-button game-secondary-btn"
+              id="blowAllButton"
+              type="button"
+            >
+              Duni sve 💨
+            </button>
+
+            <div class="cake-celebration" id="cakeCelebration">
+              <p class="final-note">Srećan rođendan! 🎉🖤</p>
+              <p class="subtext">
+                Želim ti puno sreće, da ostvariš sve što poželiš, i da uvek budes okružena ljudima koji znaju koliko vrediš.
+              </p>
+              <button class="cta-button" id="wishButton" type="button">
+                Pošalji želju u univerzum 🌠
+              </button>
+              <button
+                class="cta-button game-secondary-btn"
+                id="readLetterButton"
+                type="button"
+              >
+                Pročitaj pismo 💌
+              </button>
+              <button
+                class="cta-button game-secondary-btn"
+                id="sendLetterButton"
+                type="button"
+              >
+                Pošalji pismo u univerzum ✉️
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <div class="game-overlay" id="gameOverlay" aria-hidden="true">
+    <div class="game-overlay ui-surface" id="gameOverlay" aria-hidden="true">
       <div class="game-panel">
         <button
           class="game-close"
@@ -760,12 +1579,74 @@
       </div>
     </div>
 
+    <div
+      class="letter-overlay ui-surface"
+      id="letterOverlay"
+      aria-hidden="true"
+    >
+      <div class="letter-paper">
+        <button
+          class="letter-close"
+          id="letterClose"
+          type="button"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <div class="letter-seal">🌌</div>
+        <p class="letter-heading">
+          26.7.2026. dan kad su nove zvezde prestale da sijaju
+        </p>
+        <p class="letter-text">
+          Možda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile udaljene i sede nasmejane gledajući u mnogo veće sazveždje
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="letter-overlay ui-surface"
+      id="sendLetterOverlay"
+      aria-hidden="true"
+    >
+      <div class="letter-paper">
+        <button
+          class="letter-close"
+          id="sendLetterClose"
+          type="button"
+          aria-label="Zatvori"
+        >
+          ✕
+        </button>
+        <div class="letter-form" id="sendLetterForm">
+          <div class="letter-seal">✉️</div>
+          <p class="letter-heading">Pošalji pismo u univerzum</p>
+          <p class="letter-text" style="font-size: 0.92rem; line-height: 1.6">
+            Napiši poruku
+          </p>
+          <label class="letter-label" for="letterTo">Kome</label>
+          <input
+            class="letter-input"
+            id="letterTo"
+            type="text"
+            placeholder="kome..."
+          />
+          <label class="letter-label" for="letterContent">Poruka</label>
+          <textarea
+            class="letter-textarea"
+            id="letterContent"
+            rows="6"
+            placeholder="Napiši šta god želiš..."
+          ></textarea>
+          <button class="cta-button" id="letterSubmitButton" type="button">
+            Pošalji 💌
+          </button>
+          <p class="letter-status" id="letterStatus"></p>
+        </div>
+      </div>
+    </div>
+
     <script type="module">
       import * as THREE from "three";
-
-      /* =========================================================
-         CONFIG — identical values/behaviour to the canvas version
-         ========================================================= */
       const CONFIG = {
         starCount: 260,
         letterMinStars: 700,
@@ -788,18 +1669,15 @@
         finalGlowStart: 0.8,
       };
 
-      // Slow left/right drift applied only to the deep star layer (not the
-      // background gradient, not shooting stars) — gives a parallax "3D
-      // cosmos" feel: the far backdrop stays put, the star field glides.
+      const APPEAR_SCROLL_END = 0.5;
+      const APPEAR_FADE_WIDTH = 0.22;
+      const SHINE_MIN = 0.5;
+      const SHINE_SCROLL_RANGE = 0.6;
       const PAN_AMPLITUDE = 60;
-      const PAN_SPEED = (2 * Math.PI) / 55; // ~55s for a full left-right cycle
+      const PAN_SPEED = (2 * Math.PI) / 55;
       const WRAP_MARGIN = PAN_AMPLITUDE + 40;
       let globalPanOffset = 0;
-      let currentLetterT = 0; // 0 = pure background, 1 = letter fully formed
-
-      // Only background stars drift with the parallax pan. Letter stars fade
-      // that drift out to exactly 0 as they lock into the message, so the
-      // formed text always ends up perfectly centered and stationary.
+      let currentLetterT = 0;
       function starDrawX(s) {
         return s.x + globalPanOffset * (s.isLetter ? 1 - currentLetterT : 1);
       }
@@ -813,26 +1691,63 @@
         "Ova zvezda pamti svaki kanter koji smo odigrali",
         "Ova zvezda pamti svaki ulepsan dan",
         "Ova zvezda pamti nas prvi susret",
+        "Ova zvezda pamti svaki put kad si rekla da si ljuta na mene",
         "Ova zvezda pamti svaki put kad si mi rekla da sam bebica",
         "Ova zvezda pamti svaki put kad si mi rekla da ces da me prebijes",
         "Ova zvezda pamti nas prvi odgledan film",
         "Ova zvezda pamti 30.01.2026.",
+        "Ova zvezda pamti nasu kucu u minecraftu",
       ];
 
+      let messageQueue = [];
+      let lastShownMessage = null;
+
+      function shuffleMessages(arr) {
+        const copy = arr.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      }
+
+      function refillMessageQueue() {
+        messageQueue = shuffleMessages(STAR_MESSAGES);
+        if (messageQueue.length > 1 && messageQueue[0] === lastShownMessage) {
+          const swapIdx =
+            1 + Math.floor(Math.random() * (messageQueue.length - 1));
+          [messageQueue[0], messageQueue[swapIdx]] = [
+            messageQueue[swapIdx],
+            messageQueue[0],
+          ];
+        }
+      }
+
+      function nextTooltipMessage() {
+        if (messageQueue.length === 0) refillMessageQueue();
+        const msg = messageQueue.shift();
+        lastShownMessage = msg;
+        return msg;
+      }
+      function getMessageForStar(star) {
+        if (star.assignedMessage === null) {
+          star.assignedMessage = nextTooltipMessage();
+        }
+        return star.assignedMessage;
+      }
+
       const WISH_MESSAGES = [
-        "Mala želja, posađena ✨",
+        "Mala želja, postavljena ✨",
         "Ova je sada tvoja 🌟",
-        "Nešto lepo, samo za danas",
-        "Mala zvezda za malu želju",
+        "Nebo je upravo postalo malo lepše ✨",
         "Poslato u nebo 🎉",
-        "Još jedna zvezda, tek tako",
+        "Još jedna zvezda u tvom univerzumu ✨",
       ];
 
       const SHOOTING_MESSAGES = [
         "Uhvatila si jednu — zamisli želju! 🌠",
         "Želja zamisljena ✨",
-        "To je srećna zvezda",
-        "Brzo, zamisli želju!",
+        "Brzo zamisli želju!",
       ];
 
       const HUE_COLORS = {
@@ -843,8 +1758,15 @@
 
       const tooltip = document.getElementById("tooltip");
       const wishToast = document.getElementById("wishToast");
-      const wishButton = document.getElementById("wishButton");
       const skyContainer = document.getElementById("sky");
+
+      const cakePhase = document.getElementById("cakePhase");
+      const cakeProgressEl = document.getElementById("cakeProgress");
+      const cakeUnlockedEl = document.getElementById("cakeUnlocked");
+      const candleRow = document.getElementById("candleRow");
+      const cakeCounterEl = document.getElementById("cakeCounter");
+      const blowAllButton = document.getElementById("blowAllButton");
+      const wishButton = document.getElementById("wishButton");
 
       let W = 0,
         H = 0,
@@ -870,9 +1792,6 @@
         return arr[Math.floor(Math.random() * arr.length)];
       }
 
-      /* =========================================================
-         THREE.JS SCENE
-         ========================================================= */
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(0, 1, 0, 1, -1000, 1000);
       camera.position.z = 10;
@@ -885,9 +1804,6 @@
       renderer.setClearColor(0x05061a, 1);
       skyContainer.appendChild(renderer.domElement);
 
-      /* ---------- shared shaders ---------- */
-      // rgba line material — used for constellation links, letter links,
-      // and shooting-star trails. Vertex-level rgba, no textures needed.
       const lineVertexShader = `
         attribute vec4 aColor;
         varying vec4 vColor;
@@ -934,85 +1850,6 @@
       }
       const softCircleTexture = generateSoftCircleTexture(256);
 
-      /* ---------- Sima the space dog (floating background companion) ---------- */
-      // EDIT ME: place the image at assets/sima.png next to this HTML file
-      let simaLoaded = false;
-      let simaAspect = 410 / 348; // fallback ratio until the real image loads
-      let simaHovered = false;
-      let simaBounceStart = null;
-
-      const simaMaterial = new THREE.SpriteMaterial({
-        transparent: true,
-        depthWrite: false,
-        depthTest: false,
-        opacity: 0,
-      });
-      const simaSprite = new THREE.Sprite(simaMaterial);
-      simaSprite.renderOrder = 3;
-      simaSprite.frustumCulled = false;
-      simaSprite.visible = false;
-      scene.add(simaSprite);
-
-      new THREE.TextureLoader().load(
-        "assets/sima.png",
-        (texture) => {
-          if (THREE.SRGBColorSpace) texture.colorSpace = THREE.SRGBColorSpace;
-          simaMaterial.map = texture;
-          simaMaterial.needsUpdate = true;
-          if (texture.image && texture.image.width && texture.image.height) {
-            simaAspect = texture.image.width / texture.image.height;
-          }
-          simaLoaded = true;
-          simaSprite.visible = true;
-        },
-        undefined,
-        () => {
-          console.warn("Sima image not found — expected at assets/sima.png");
-        },
-      );
-
-      function simaContainsPoint(px, py) {
-        if (!simaLoaded) return false;
-        const halfW = simaSprite.scale.x / 2;
-        const halfH = simaSprite.scale.y / 2;
-        return (
-          Math.abs(px - simaSprite.position.x) <= halfW &&
-          Math.abs(py - simaSprite.position.y) <= halfH
-        );
-      }
-
-      function simaTooltipPos() {
-        return {
-          x: simaSprite.position.x,
-          y: simaSprite.position.y - simaSprite.scale.y / 2 - 8,
-        };
-      }
-
-      function updateSima() {
-        if (!simaLoaded) return;
-        // gentle wandering flight path — independent of the star-field pan,
-        // so it reads as its own nearby, "alive" layer
-        const driftX =
-          W * 0.72 + Math.sin(time * 0.09) * Math.min(W * 0.16, 130);
-        const driftY = H * 0.3 + Math.cos(time * 0.13) * Math.min(H * 0.12, 70);
-        simaSprite.position.set(driftX, driftY, 0.15);
-        simaMaterial.rotation = Math.sin(time * 0.5) * 0.06;
-        simaMaterial.opacity = 1;
-
-        let bounce = 0;
-        if (simaBounceStart !== null) {
-          const bt = (time - simaBounceStart) / 0.5;
-          if (bt >= 1) {
-            simaBounceStart = null;
-          } else {
-            bounce = Math.sin(bt * Math.PI) * 0.18;
-          }
-        }
-        const targetWidth = clamp(W * 0.22, 90, 170) * (1 + bounce);
-        simaSprite.scale.set(targetWidth, targetWidth / simaAspect, 1);
-      }
-
-      /* ---------- background (sky gradient + nebulae + galaxy band + dust) ---------- */
       const bgMaterial = new THREE.ShaderMaterial({
         uniforms: {
           uResolution: { value: new THREE.Vector2(1, 1) },
@@ -1091,7 +1928,6 @@
       bgMesh.frustumCulled = false;
       scene.add(bgMesh);
 
-      /* ---------- stars (Points, halo+core in one shader) ---------- */
       const starsVertexShader = `
         attribute float aAlpha;
         attribute vec3 aColor;
@@ -1159,11 +1995,9 @@
 
       let starsPoints = null;
       let starsGeo = null;
-      let starList = []; // parallel JS-side data, mirrors the old Star objects
+      let starList = [];
       let starCapacity = 0;
       let activeStarCount = 0;
-
-      /* ---------- constellation + letter connection lines ---------- */
       const maxLinksPerStarBudget = CONFIG.linksPerStar;
       let constellationGeo, constellationLines;
       let letterGeo, letterLines;
@@ -1197,7 +2031,6 @@
         col[idx * 4 + 3] = a;
       }
 
-      /* ---------- hover ring ---------- */
       const ringSegs = 32;
       const ringPosArr = new Float32Array((ringSegs + 1) * 3);
       for (let i = 0; i <= ringSegs; i++) {
@@ -1224,7 +2057,6 @@
       ringMesh.frustumCulled = false;
       scene.add(ringMesh);
 
-      /* ---------- final aura sprite ---------- */
       const auraMaterial = new THREE.SpriteMaterial({
         map: softCircleTexture,
         color: 0xcbb4ff,
@@ -1238,12 +2070,14 @@
       auraSprite.frustumCulled = false;
       scene.add(auraSprite);
 
-      /* ---------- shooting stars (tapered comet mesh + glowing head) ----------
-         NOTE: a plain THREE.Line renders at a hard 1px width on most GPUs/
-         browsers (WebGL clamps gl.lineWidth), which made the old trail all
-         but invisible. A thin tapered triangle + additive blending gives a
-         real, clearly visible comet streak instead. */
       let shootingStarsList = [];
+      const SHOOTING_COLOR_SETS = [
+        { trail: [1, 1, 1], head: 0xffffff },
+        { trail: [203 / 255, 180 / 255, 1], head: 0xcbb4ff },
+        { trail: [1, 227 / 255, 176 / 255], head: 0xffe3b0 },
+        { trail: [185 / 255, 200 / 255, 1], head: 0xb9c8ff },
+        { trail: [1, 200 / 255, 214 / 255], head: 0xffc8d6 },
+      ];
 
       function makeCometMaterial() {
         const m = makeLineMaterial();
@@ -1257,6 +2091,7 @@
         const startX = fromLeft ? -60 : W + 60;
         const startY = Math.random() * H * 0.6;
         const speed = 9 + Math.random() * 6;
+        const colorSet = pick(SHOOTING_COLOR_SETS);
 
         const geo = new THREE.BufferGeometry();
         geo.setAttribute(
@@ -1275,13 +2110,11 @@
         const mesh = new THREE.Mesh(geo, makeCometMaterial());
         mesh.renderOrder = 6;
         mesh.frustumCulled = false;
-        // shooting stars fly in raw screen space, independent of the
-        // slow-drifting deep star field, so they read as "closer" objects
         scene.add(mesh);
 
         const headMat = new THREE.SpriteMaterial({
           map: softCircleTexture,
-          color: 0xffffff,
+          color: colorSet.head,
           transparent: true,
           opacity: 0,
           depthWrite: false,
@@ -1303,6 +2136,7 @@
           geo,
           mesh,
           head,
+          colorSet,
         });
       }
 
@@ -1335,6 +2169,7 @@
 
           const pos = s.geo.attributes.position.array;
           const col = s.geo.attributes.aColor.array;
+          const tc = s.colorSet ? s.colorSet.trail : [1, 1, 1];
           pos[0] = headLx;
           pos[1] = headLy;
           pos[2] = 0;
@@ -1344,17 +2179,17 @@
           pos[6] = tailX;
           pos[7] = tailY;
           pos[8] = 0;
-          col[0] = 1;
-          col[1] = 1;
-          col[2] = 1;
+          col[0] = tc[0];
+          col[1] = tc[1];
+          col[2] = tc[2];
           col[3] = 0.9 * alpha;
-          col[4] = 1;
-          col[5] = 1;
-          col[6] = 1;
+          col[4] = tc[0];
+          col[5] = tc[1];
+          col[6] = tc[2];
           col[7] = 0.9 * alpha;
-          col[8] = 200 / 255;
-          col[9] = 210 / 255;
-          col[10] = 255 / 255;
+          col[8] = tc[0];
+          col[9] = tc[1];
+          col[10] = tc[2];
           col[11] = 0;
           s.geo.attributes.position.needsUpdate = true;
           s.geo.attributes.aColor.needsUpdate = true;
@@ -1381,6 +2216,11 @@
             dy = s.y - py;
           if (Math.sqrt(dx * dx + dy * dy) < 34) {
             spawnBurst(s.x, s.y, "255,240,210", 22);
+            spawnRingBurst(s.x, s.y, 0xffe3b0, {
+              maxLife: 34,
+              startR: 4,
+              endR: 30,
+            });
             showToast(pick(SHOOTING_MESSAGES), 2200);
             scene.remove(s.mesh);
             scene.remove(s.head);
@@ -1394,7 +2234,6 @@
         return false;
       }
 
-      /* ---------- sparkles (burst particles) ---------- */
       const MAX_SPARKLES = 800;
       const sparkleVertexShader = `
         attribute float aAlpha;
@@ -1516,11 +2355,48 @@
         sparkleGeo.attributes.aRadius.needsUpdate = true;
       }
 
-      /* =========================================================
-         Letter-shape sampling (unchanged technique — offscreen 2D
-         canvas used purely to rasterize text and sample pixel
-         positions; nothing to do with the renderer)
-         ========================================================= */
+      let ringBurstList = [];
+
+      function spawnRingBurst(x, y, colorHex, opts) {
+        const options = opts || {};
+        const mat = new THREE.LineBasicMaterial({
+          color: colorHex,
+          transparent: true,
+          opacity: 0.9,
+          depthTest: false,
+          depthWrite: false,
+        });
+        const mesh = new THREE.LineLoop(ringGeo, mat);
+        mesh.renderOrder = 9;
+        mesh.frustumCulled = false;
+        mesh.position.set(x, y, 0.4);
+        scene.add(mesh);
+        ringBurstList.push({
+          mesh,
+          life: 0,
+          maxLife: options.maxLife || 42,
+          startR: options.startR || 6,
+          endR: options.endR || 52,
+        });
+      }
+
+      function updateAndDrawRingBursts() {
+        for (let i = ringBurstList.length - 1; i >= 0; i--) {
+          const b = ringBurstList[i];
+          b.life++;
+          const t = clamp(b.life / b.maxLife, 0, 1);
+          const eased = 1 - Math.pow(1 - t, 3);
+          const r = lerp(b.startR, b.endR, eased);
+          b.mesh.scale.set(r, r, 1);
+          b.mesh.material.opacity = 0.85 * (1 - t);
+          if (b.life >= b.maxLife) {
+            scene.remove(b.mesh);
+            b.mesh.material.dispose();
+            ringBurstList.splice(i, 1);
+          }
+        }
+      }
+
       function generateLetterTargets(width, height, text) {
         const off = document.createElement("canvas");
         off.width = width;
@@ -1648,10 +2524,6 @@
         };
       }
 
-      /* =========================================================
-         Star class (JS-side data only — GPU buffers are written
-         from this each frame)
-         ========================================================= */
       class Star {
         constructor(x, y) {
           this.x = x;
@@ -1669,15 +2541,12 @@
           const driftScale = CONFIG.reducedMotion ? 0 : 0.055;
           this.vx = (Math.random() - 0.5) * driftScale;
           this.vy = (Math.random() - 0.5) * driftScale;
-          this.message =
-            STAR_MESSAGES[Math.floor(Math.random() * STAR_MESSAGES.length)];
           this.hue = Math.random() < 0.7 ? "pale" : "blue";
+          this.appearThreshold = Math.random();
+          this.assignedMessage = null;
         }
       }
 
-      /* =========================================================
-         Build / rebuild the whole starfield + GPU buffers
-         ========================================================= */
       function buildStars() {
         if (starsPoints) {
           scene.remove(starsPoints);
@@ -1691,7 +2560,7 @@
         );
         letterSpacing = spacing;
         const totalStars = Math.max(CONFIG.starCount, targets.length + 60);
-        starCapacity = totalStars + 400; // headroom for wish stars planted later
+        starCapacity = totalStars + 400;
 
         starList = [];
         for (let i = 0; i < totalStars; i++) {
@@ -1707,9 +2576,6 @@
           star.isLetter = true;
           star.targetX = sortedTargets[i].x;
           star.targetY = sortedTargets[i].y;
-          star.message = STAR_MESSAGES[i % STAR_MESSAGES.length];
-          // legibility floor: a letter star should never be too dim/small
-          // to read, no matter how sparse its local neighborhood is
           star.radius = Math.max(star.radius, 1.35);
           star.baseBrightness = Math.max(star.baseBrightness, 0.72);
         });
@@ -1756,7 +2622,6 @@
           ),
         );
 
-        // static-ish attributes filled once per star (only appended to later)
         const colorArr = starsGeo.attributes.aColor.array;
         const radiusArr = starsGeo.attributes.aRadius.array;
         const isWishArr = starsGeo.attributes.aIsWish.array;
@@ -1784,8 +2649,6 @@
         starsPoints.renderOrder = 2;
         starsPoints.frustumCulled = false;
         scene.add(starsPoints);
-
-        // (re)allocate constellation + letter connection line buffers
         const maxConstellationVerts = totalStars * CONFIG.linksPerStar * 2;
         if (constellationLines) {
           scene.remove(constellationLines);
@@ -1816,6 +2679,11 @@
       function plantWishStar(px, py) {
         if (activeStarCount >= starCapacity) {
           spawnBurst(px, py, "255,227,176", 16);
+          spawnRingBurst(px, py, 0xffe3b0, {
+            maxLife: 32,
+            startR: 3,
+            endR: 26,
+          });
           showToast(pick(WISH_MESSAGES), 1900);
           return;
         }
@@ -1825,7 +2693,7 @@
         star.vx = 0;
         star.vy = 0;
         star.radius = 1.6 + Math.random() * 0.8;
-        star.message = pick(STAR_MESSAGES);
+        star.appearThreshold = 0;
         starList.push(star);
         starsGeo._writeStaticStarAttrs(activeStarCount, star);
         activeStarCount++;
@@ -1836,19 +2704,20 @@
         starsGeo.attributes.aIsLetter.needsUpdate = true;
 
         spawnBurst(px, py, "255,227,176", 16);
+        spawnRingBurst(px, py, 0xffe3b0, { maxLife: 32, startR: 3, endR: 26 });
         showToast(pick(WISH_MESSAGES), 1900);
       }
 
-      /* =========================================================
-         Per-frame star update: position + twinkle alpha only.
-         (Color / radius / flags are static once written, which is
-         the main win over the canvas version — no per-star gradient
-         fills every frame, just cheap attribute buffer writes.)
-         ========================================================= */
       function updateStars(letterT, finalGlowT) {
         currentLetterT = letterT;
         const pos = starsGeo.attributes.position.array;
         const alp = starsGeo.attributes.aAlpha.array;
+        const shineBoost = lerp(
+          SHINE_MIN,
+          1,
+          clamp(scrollProgress / SHINE_SCROLL_RANGE, 0, 1),
+        );
+
         for (let i = 0; i < starList.length; i++) {
           const s = starList[i];
           if (!s.isWish) {
@@ -1880,11 +2749,23 @@
           const wishPulse = s.isWish
             ? 0.85 + 0.15 * Math.sin(time * 1.6 + s.twinkleSeed)
             : 1;
+          let appearAlpha = 1;
+          if (!s.isWish) {
+            const windowStart =
+              s.appearThreshold * (APPEAR_SCROLL_END - APPEAR_FADE_WIDTH);
+            const windowEnd = windowStart + APPEAR_FADE_WIDTH;
+            const rawAppear = clamp(
+              (scrollProgress - windowStart) / (windowEnd - windowStart),
+              0,
+              1,
+            );
+            appearAlpha = easeInOutCubic(rawAppear);
+          }
 
           pos[i * 3] = starDrawX(s);
           pos[i * 3 + 1] = s.y;
           pos[i * 3 + 2] = 0;
-          alp[i] = b * wishPulse;
+          alp[i] = b * wishPulse * appearAlpha * shineBoost;
         }
         starsGeo.attributes.position.needsUpdate = true;
         starsGeo.attributes.aAlpha.needsUpdate = true;
@@ -2001,6 +2882,52 @@
         letterGeo.attributes.aColor.needsUpdate = true;
       }
 
+      let letterCelebrated = false;
+
+      function triggerLetterCelebration() {
+        let minX = Infinity,
+          maxX = -Infinity,
+          minY = Infinity,
+          maxY = -Infinity;
+        let any = false;
+        for (const s of starList) {
+          if (!s.isLetter) continue;
+          any = true;
+          if (s.x < minX) minX = s.x;
+          if (s.x > maxX) maxX = s.x;
+          if (s.y < minY) minY = s.y;
+          if (s.y > maxY) maxY = s.y;
+        }
+        if (!any) return;
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const spanX = Math.max(maxX - minX, 80);
+
+        spawnRingBurst(cx, cy, 0xcbb4ff, {
+          maxLife: 60,
+          startR: 10,
+          endR: spanX * 0.7,
+        });
+        setTimeout(
+          () =>
+            spawnRingBurst(cx, cy, 0xffe3b0, {
+              maxLife: 55,
+              startR: 8,
+              endR: spanX * 0.55,
+            }),
+          140,
+        );
+        for (let i = 0; i < 4; i++) {
+          setTimeout(() => {
+            const bx = cx + (Math.random() - 0.5) * spanX * 0.9;
+            const by = cy + (Math.random() - 0.5) * 60;
+            spawnBurst(bx, by, i % 2 === 0 ? "203,180,255" : "255,227,176", 18);
+          }, i * 160);
+        }
+        spawnShootingStar();
+        showToast("Sve zvezde su na svom mestu ✨", 2600);
+      }
+
       function updateFinalAura(finalGlowT) {
         if (finalGlowT <= 0) {
           auraMaterial.opacity = 0;
@@ -2031,9 +2958,6 @@
         auraMaterial.opacity = 0.5 * finalGlowT;
       }
 
-      /* =========================================================
-         Sizing / camera
-         ========================================================= */
       function resizeRendererAndCamera() {
         W = window.innerWidth;
         H = window.innerHeight;
@@ -2071,9 +2995,6 @@
         }, 220);
       });
 
-      /* =========================================================
-         Scroll-driven story progress (unchanged)
-         ========================================================= */
       const phase4El = document.querySelector(".phase-4");
 
       function computeScrollProgress() {
@@ -2082,6 +3003,37 @@
           : document.documentElement.scrollHeight;
         const storyMax = Math.max(1, storyEnd - window.innerHeight);
         scrollProgress = clamp(window.scrollY / storyMax, 0, 1);
+      }
+
+      const storyProgressEl = document.getElementById("storyProgress");
+      const storyDots = storyProgressEl
+        ? Array.from(storyProgressEl.querySelectorAll(".story-dot"))
+        : [];
+      const storyPhaseEls = Array.from(
+        document.querySelectorAll(
+          '.phase[data-phase="1"], .phase[data-phase="2"], .phase[data-phase="3"], .phase[data-phase="4"]',
+        ),
+      );
+
+      function updateStoryProgress() {
+        if (!storyProgressEl || storyPhaseEls.length === 0) return;
+
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        let activeIndex = 0;
+
+        storyPhaseEls.forEach((el, i) => {
+          const top = el.offsetTop;
+          if (viewportCenter >= top) activeIndex = i;
+        });
+
+        const pastStory = scrollProgress >= 0.985;
+        const atVeryTop = window.scrollY < 40;
+        storyProgressEl.classList.toggle("visible", !pastStory && !atVeryTop);
+
+        storyDots.forEach((dot, i) => {
+          dot.classList.toggle("active", i === activeIndex);
+          dot.classList.toggle("filled", i < activeIndex);
+        });
       }
 
       let scrollTicking = false;
@@ -2093,6 +3045,7 @@
           if (!scrollTicking) {
             requestAnimationFrame(() => {
               computeScrollProgress();
+              updateStoryProgress();
               const delta = Math.abs(window.scrollY - lastScrollY);
               const now = performance.now();
               if (delta > 4 && now - lastShootingStarAt > 350) {
@@ -2126,9 +3079,8 @@
         .querySelectorAll(".phase")
         .forEach((section) => revealObserver.observe(section));
 
-      /* =========================================================
-         Tooltip / toast / interaction (unchanged behaviour)
-         ========================================================= */
+      const UI_BLOCK_SELECTOR = "button, .ui-surface";
+
       function findNearestStar(px, py) {
         let nearest = null,
           nearestDist = CONFIG.hoverRadius;
@@ -2145,7 +3097,7 @@
       }
 
       function showTooltip(star) {
-        tooltip.textContent = star.message;
+        tooltip.textContent = getMessageForStar(star);
         tooltip.style.left = starDrawX(star) + "px";
         tooltip.style.top = star.y + "px";
         tooltip.classList.add("visible");
@@ -2154,7 +3106,6 @@
       function hideTooltip() {
         tooltip.classList.remove("visible");
         hoveredStar = null;
-        simaHovered = false;
       }
 
       function showToast(text, duration) {
@@ -2167,30 +3118,7 @@
       }
 
       function handleSkyInteraction(x, y, isTapAndHold) {
-        // shooting stars fly in raw screen space (unaffected by the star-field pan)
         if (tryCatchShootingStar(x, y)) return;
-        if (simaContainsPoint(x, y)) {
-          simaHovered = true;
-          hoveredStar = null;
-          const p = simaTooltipPos();
-          tooltip.textContent = "sima";
-          tooltip.style.left = p.x + "px";
-          tooltip.style.top = p.y + "px";
-          tooltip.classList.add("visible");
-          spawnBurst(
-            simaSprite.position.x,
-            simaSprite.position.y,
-            "255,227,176",
-            14,
-          );
-          simaBounceStart = time;
-          if (isTapAndHold) {
-            clearTimeout(activeTooltipTimeout);
-            activeTooltipTimeout = setTimeout(hideTooltip, 3200);
-          }
-          return;
-        }
-        // hit-testing already compares against each star's real drawn position
         const star = findNearestStar(x, y);
         if (star) {
           hoveredStar = star;
@@ -2201,25 +3129,46 @@
             activeTooltipTimeout = setTimeout(hideTooltip, 3200);
           }
         } else {
-          // planted wish stars are background-layer (non-letter), so they
-          // always get the full drift — store them in un-offset star-space
           plantWishStar(x - globalPanOffset, y);
         }
       }
 
+      let lastTrailTime = 0;
+      let lastTrailX = -9999;
+      let lastTrailY = -9999;
+      const TRAIL_MIN_DIST = 16;
+      const TRAIL_MIN_INTERVAL = 45;
+
+      function maybeSpawnTrailSparkle(x, y) {
+        if (CONFIG.reducedMotion) return;
+        const now = performance.now();
+        const dist = Math.hypot(x - lastTrailX, y - lastTrailY);
+        if (now - lastTrailTime < TRAIL_MIN_INTERVAL || dist < TRAIL_MIN_DIST)
+          return;
+        lastTrailTime = now;
+        lastTrailX = x;
+        lastTrailY = y;
+        if (sparkleList.length >= MAX_SPARKLES) sparkleList.shift();
+        const hue = Math.random() < 0.75 ? [238, 241, 255] : [203, 180, 255];
+        sparkleList.push({
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35 - 0.12,
+          life: 0,
+          maxLife: 24 + Math.random() * 14,
+          radius: 0.6 + Math.random() * 0.8,
+          color: hue.map((v) => v / 255),
+        });
+      }
+
       window.addEventListener("mousemove", (e) => {
-        if (simaContainsPoint(e.clientX, e.clientY)) {
-          simaHovered = true;
-          hoveredStar = null;
-          const p = simaTooltipPos();
-          tooltip.textContent = "sima";
-          tooltip.style.left = p.x + "px";
-          tooltip.style.top = p.y + "px";
-          tooltip.classList.add("visible");
-          renderer.domElement.style.cursor = "pointer";
+        if (e.target.closest(UI_BLOCK_SELECTOR)) {
+          renderer.domElement.style.cursor = "default";
+          hideTooltip();
           return;
         }
-        simaHovered = false;
+        maybeSpawnTrailSparkle(e.clientX, e.clientY);
         const star = findNearestStar(e.clientX, e.clientY);
         if (star) {
           hoveredStar = star;
@@ -2234,21 +3183,23 @@
       window.addEventListener("mouseleave", hideTooltip);
 
       window.addEventListener("click", (e) => {
-        if (e.target.closest("button")) return;
+        if (e.target.closest(UI_BLOCK_SELECTOR)) return;
         handleSkyInteraction(e.clientX, e.clientY, false);
       });
 
       let touchStartX = 0,
         touchStartY = 0,
         touchStartTime = 0,
-        touchMoved = false;
+        touchMoved = false,
+        touchStartedOnUi = false;
       const TAP_MAX_MOVE = 12;
       const TAP_MAX_DURATION = 450;
 
       window.addEventListener(
         "touchstart",
         (e) => {
-          if (e.target.closest("button")) return;
+          touchStartedOnUi = !!e.target.closest(UI_BLOCK_SELECTOR);
+          if (touchStartedOnUi) return;
           const touch = e.touches[0];
           if (!touch) return;
           touchStartX = touch.clientX;
@@ -2262,11 +3213,13 @@
       window.addEventListener(
         "touchmove",
         (e) => {
+          if (touchStartedOnUi) return;
           const touch = e.touches[0];
           if (!touch) return;
           const dx = touch.clientX - touchStartX;
           const dy = touch.clientY - touchStartY;
           if (Math.sqrt(dx * dx + dy * dy) > TAP_MAX_MOVE) touchMoved = true;
+          maybeSpawnTrailSparkle(touch.clientX, touch.clientY);
         },
         { passive: true },
       );
@@ -2274,7 +3227,7 @@
       window.addEventListener(
         "touchend",
         (e) => {
-          if (e.target.closest("button")) return;
+          if (touchStartedOnUi || e.target.closest(UI_BLOCK_SELECTOR)) return;
           if (touchMoved) return;
           const duration = performance.now() - touchStartTime;
           if (duration > TAP_MAX_DURATION) return;
@@ -2283,26 +3236,312 @@
         { passive: true },
       );
 
-      if (wishButton) {
-        wishButton.addEventListener("click", (e) => {
-          e.stopPropagation();
-          for (let i = 0; i < 5; i++) {
-            spawnBurst(
-              Math.random() * W,
-              H * (0.25 + Math.random() * 0.5),
-              "255,240,210",
-              14,
-            );
-          }
-          spawnShootingStar();
-          showToast("Zelja poslata u univerzum ✨", 2400);
+      const GAME_KEYS = ["memory", "catcher", "sima", "puzzle"];
+      const CANDLE_COUNT = 19;
+      let completedGames = new Set();
+      let blownCandles = 0;
+   const DEV_PARAMS = new URLSearchParams(window.location.search);
+if (DEV_PARAMS.has("dev") || DEV_PARAMS.has("skip")) {
+  GAME_KEYS.forEach((key) => markGameComplete(key));
+}
+      function markGameComplete(key) {
+        if (completedGames.has(key)) return;
+        completedGames.add(key);
+        updateCakeProgressUI();
+        spawnRingBurst(W / 2, H * 0.28, 0xcbb4ff, {
+          maxLife: 46,
+          startR: 6,
+          endR: 60,
+        });
+        if (completedGames.size === GAME_KEYS.length) unlockCake();
+      }
+
+      function updateCakeProgressUI() {
+        if (cakeProgressEl) {
+          cakeProgressEl.textContent = `${completedGames.size} / ${GAME_KEYS.length} igre odigrane`;
+        }
+      }
+
+      function unlockCake() {
+        if (!cakePhase || cakePhase.classList.contains("unlocked")) return;
+        cakePhase.classList.add("unlocked");
+        buildCandles();
+        showToast("Odigrala si sve igre 🎂", 2600);
+      }
+
+      function buildCandles() {
+        if (!candleRow) return;
+        candleRow.innerHTML = "";
+        blownCandles = 0;
+        updateCakeCounter();
+        for (let i = 0; i < CANDLE_COUNT; i++) {
+          const candle = document.createElement("button");
+          candle.type = "button";
+          candle.className = "candle";
+          candle.setAttribute("aria-label", "Svećica");
+          const flame = document.createElement("span");
+          flame.className = "candle-flame";
+          const smoke = document.createElement("span");
+          smoke.className = "candle-smoke";
+          candle.appendChild(flame);
+          candle.appendChild(smoke);
+          candle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            blowCandle(candle);
+          });
+          candleRow.appendChild(candle);
+        }
+      }
+
+      function updateCakeCounter() {
+        if (!cakeCounterEl) return;
+        const remaining = CANDLE_COUNT - blownCandles;
+        cakeCounterEl.textContent =
+          remaining > 0
+            ? `${remaining} svećica čeka`
+            : "Sve svećice su ugašene 🖤";
+      }
+
+      function blowCandle(candle) {
+        if (candle.classList.contains("blown")) return;
+        candle.classList.add("blown");
+        blownCandles++;
+        updateCakeCounter();
+        const rect = candle.getBoundingClientRect();
+        const cxp = rect.left + rect.width / 2;
+        spawnBurst(cxp, rect.top, "255,227,176", 10);
+        spawnRingBurst(cxp, rect.top, 0xffe3b0, {
+          maxLife: 26,
+          startR: 3,
+          endR: 18,
+        });
+        if (blownCandles >= CANDLE_COUNT) {
+          setTimeout(celebrateCake, 350);
+        }
+      }
+
+      function blowAllCandlesAtOnce() {
+        if (!candleRow) return;
+        const candles = candleRow.querySelectorAll(".candle:not(.blown)");
+        candles.forEach((candle, i) => {
+          setTimeout(() => blowCandle(candle), i * 60);
         });
       }
 
-      /* =========================================================
-         Mini-games — unchanged from the original (pure DOM/CSS,
-         no canvas / three.js involved)
-         ========================================================= */
+      function celebrateCake() {
+        if (cakeUnlockedEl) cakeUnlockedEl.classList.add("all-blown");
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            const bx = Math.random() * W;
+            const by = H * (0.2 + Math.random() * 0.5);
+            const goldish = i % 2 === 0;
+            spawnBurst(bx, by, goldish ? "255,240,210" : "203,180,255", 20);
+            spawnRingBurst(bx, by, goldish ? 0xffe3b0 : 0xcbb4ff, {
+              maxLife: 40,
+              startR: 4,
+              endR: 34,
+            });
+          }, i * 180);
+        }
+        spawnShootingStar();
+        spawnConfetti();
+        showToast("Srećan 19. rođendan! 🎉", 2800);
+      }
+
+      const CONFETTI_COLORS = [
+        "#cbb4ff",
+        "#ffe3b0",
+        "#eef1ff",
+        "#b9c8ff",
+        "#ffc8d6",
+      ];
+      function spawnConfetti(count) {
+        if (CONFIG.reducedMotion) return;
+        const total = count || 130;
+        for (let i = 0; i < total; i++) {
+          const el = document.createElement("div");
+          el.className = "confetti-piece";
+          const duration = 2.6 + Math.random() * 2.4;
+          const delay = Math.random() * 0.7;
+          el.style.left = Math.random() * 100 + "vw";
+          el.style.background =
+            CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
+          el.style.borderRadius = Math.random() < 0.5 ? "50%" : "2px";
+          el.style.setProperty("--drift", (Math.random() - 0.5) * 160 + "px");
+          el.style.animationDuration = duration + "s";
+          el.style.animationDelay = delay + "s";
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), (duration + delay) * 1000 + 300);
+        }
+      }
+
+      function makeWish() {
+        for (let i = 0; i < 5; i++) {
+          const bx = Math.random() * W;
+          const by = H * (0.25 + Math.random() * 0.5);
+          spawnBurst(bx, by, "255,240,210", 14);
+          spawnRingBurst(bx, by, 0xffe3b0, {
+            maxLife: 36,
+            startR: 3,
+            endR: 26,
+          });
+        }
+        spawnShootingStar();
+        showToast("Zelja poslata u univerzum ✨", 2400);
+      }
+
+      if (blowAllButton) {
+        blowAllButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          blowAllCandlesAtOnce();
+        });
+      }
+      if (wishButton) {
+        wishButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          makeWish();
+        });
+      }
+
+      const EMAILJS_SERVICE_ID = "service_mvd2zgs";
+      const EMAILJS_TEMPLATE_ID = "template_6xvcmid";
+      const EMAILJS_PUBLIC_KEY = "YIaU-95-g9f3PV6gO";
+      const LETTER_RECEIVER_EMAIL = "lukastojkovicalt@gmail.com";
+
+      const emailjsReady =
+        !!(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) &&
+        typeof window.emailjs !== "undefined";
+      if (emailjsReady) {
+        window.emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      }
+
+      const letterOverlay = document.getElementById("letterOverlay");
+      const letterClose = document.getElementById("letterClose");
+      const readLetterButton = document.getElementById("readLetterButton");
+
+      const sendLetterOverlay = document.getElementById("sendLetterOverlay");
+      const sendLetterClose = document.getElementById("sendLetterClose");
+      const sendLetterButton = document.getElementById("sendLetterButton");
+      const letterToInput = document.getElementById("letterTo");
+      const letterContentInput = document.getElementById("letterContent");
+      const letterSubmitButton = document.getElementById("letterSubmitButton");
+      const letterStatusEl = document.getElementById("letterStatus");
+
+      function openLetterOverlay(overlay) {
+        if (!overlay) return;
+        overlay.classList.add("visible");
+        overlay.setAttribute("aria-hidden", "false");
+      }
+      function closeLetterOverlay(overlay) {
+        if (!overlay) return;
+        overlay.classList.remove("visible");
+        overlay.setAttribute("aria-hidden", "true");
+      }
+
+      if (readLetterButton) {
+        readLetterButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          openLetterOverlay(letterOverlay);
+        });
+      }
+      if (letterClose) {
+        letterClose.addEventListener("click", () =>
+          closeLetterOverlay(letterOverlay),
+        );
+      }
+      if (letterOverlay) {
+        letterOverlay.addEventListener("click", (e) => {
+          if (e.target === letterOverlay) closeLetterOverlay(letterOverlay);
+        });
+      }
+
+      if (sendLetterButton) {
+        sendLetterButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          if (letterStatusEl) letterStatusEl.textContent = "";
+          openLetterOverlay(sendLetterOverlay);
+        });
+      }
+      if (sendLetterClose) {
+        sendLetterClose.addEventListener("click", () =>
+          closeLetterOverlay(sendLetterOverlay),
+        );
+      }
+      if (sendLetterOverlay) {
+        sendLetterOverlay.addEventListener("click", (e) => {
+          if (e.target === sendLetterOverlay)
+            closeLetterOverlay(sendLetterOverlay);
+        });
+      }
+
+      window.addEventListener("keydown", (e) => {
+        if (e.key !== "Escape") return;
+        if (letterOverlay && letterOverlay.classList.contains("visible"))
+          closeLetterOverlay(letterOverlay);
+        if (
+          sendLetterOverlay &&
+          sendLetterOverlay.classList.contains("visible")
+        )
+          closeLetterOverlay(sendLetterOverlay);
+      });
+
+      async function submitUniverseLetter() {
+        const to = (letterToInput && letterToInput.value) || "";
+        const content = (letterContentInput && letterContentInput.value) || "";
+
+        if (!to.trim() || !content.trim()) {
+          if (letterStatusEl)
+            letterStatusEl.textContent = "Popuni oba polja pre slanja 🙂";
+          return;
+        }
+
+        if (letterSubmitButton) letterSubmitButton.disabled = true;
+        if (letterStatusEl) letterStatusEl.textContent = "Šaljem...";
+
+        let sentAutomatically = false;
+        if (emailjsReady) {
+          try {
+            const res = await window.emailjs.send(
+              EMAILJS_SERVICE_ID,
+              EMAILJS_TEMPLATE_ID,
+              {
+                za: to,
+                poruka: content,
+                poslato: new Date().toLocaleString("sr-RS"),
+              },
+            );
+            sentAutomatically = res && res.status === 200;
+          } catch (err) {
+            sentAutomatically = false;
+          }
+        }
+
+        if (sentAutomatically) {
+          if (letterStatusEl)
+            letterStatusEl.textContent = "Poslato u univerzum ✨";
+          spawnConfetti(40);
+          if (letterToInput) letterToInput.value = "";
+          if (letterContentInput) letterContentInput.value = "";
+          if (letterSubmitButton) letterSubmitButton.disabled = false;
+          return;
+        }
+
+        const subject = encodeURIComponent(`Pismo iz univerzuma — za: ${to}`);
+        const body = encodeURIComponent(`Za: ${to}\n\n${content}`);
+        window.location.href = `mailto:${LETTER_RECEIVER_EMAIL}?subject=${subject}&body=${body}`;
+        if (letterStatusEl)
+          letterStatusEl.textContent =
+            "Otvara se tvoj mejl da pošalješ poruku ✉️";
+        if (letterSubmitButton) letterSubmitButton.disabled = false;
+      }
+
+      if (letterSubmitButton) {
+        letterSubmitButton.addEventListener("click", (e) => {
+          e.stopPropagation();
+          submitUniverseLetter();
+        });
+      }
+
       const gameOverlay = document.getElementById("gameOverlay");
       const gameContainer = document.getElementById("gameContainer");
       const gameClose = document.getElementById("gameClose");
@@ -2332,7 +3571,7 @@
         currentGame = game;
         if (game === "memory") startMemoryGame();
         else if (game === "catcher") startCatcherGame();
-        else if (game === "quiz") startQuizGame();
+        else if (game === "sima") startSimaGame();
         else if (game === "puzzle") startPuzzleGame();
       }
 
@@ -2379,9 +3618,6 @@
           .addEventListener("click", closeGameOverlay);
       }
 
-      // ---- Memory match ----
-      // EDIT ME: her face stickers — expects files at
-      // assets/stickers/1-sticker.png ... 6-sticker.png next to this HTML.
       const STICKER_COUNT = 6;
       const STICKER_EXT = "png";
       const MEMORY_STICKERS = Array.from(
@@ -2397,7 +3633,7 @@
         }
 
         gameContainer.innerHTML = `
-          <p class="game-title">Igra pamćenja 🧠</p>
+          <p class="game-title">Memory game 🧠</p>
           <p class="game-subtitle">Pronađi sve parove.</p>
           <div class="memory-grid" id="memoryGrid"></div>
           <p class="game-hud" id="memoryHud">Potezi: 0</p>
@@ -2462,8 +3698,9 @@
             matchedCount += 2;
             first = null;
             if (matchedCount === stickers.length) {
+              markGameComplete("memory");
               pendingTimeout = setTimeout(() => {
-                showGameResult("GG! 🎉", `Rešila si sve u ${moves} poteza.`);
+                showGameResult("Dzidzarica", `Rešila si u ${moves} poteza.`);
               }, 500);
             }
           } else {
@@ -2490,7 +3727,6 @@
         };
       }
 
-      // ---- Star catcher ----
       function startCatcherGame() {
         gameContainer.innerHTML = `
           <p class="game-title">Catch stars ⭐</p>
@@ -2510,7 +3746,7 @@
           spawnTimer = null,
           tickTimer = null,
           ended = false;
-        const starGlyphs = ["⭐", "✨", "🌟"];
+        const starGlyphs = ["⭐", "✨", "🖤"];
 
         function spawnStar() {
           if (ended) return;
@@ -2555,13 +3791,14 @@
         function endCatcher() {
           if (ended) return;
           ended = true;
+          markGameComplete("catcher");
           clearTimeout(spawnTimer);
           clearInterval(tickTimer);
           stage.querySelectorAll(".catcher-star").forEach((s) => s.remove());
           let msg;
-          if (score >= 18) msg = "Nezaustavljiva! 🌠";
-          else if (score >= 10) msg = "Odlično ulovljeno! ⭐";
-          else msg = "Lepo pokušano — probaj ponovo! ✨";
+          if (score >= 18) msg = "Kida";
+          else if (score >= 10) msg = "Nije loše";
+          else msg = "Nubara, probaj opet 💀";
           setTimeout(() => showGameResult(`Poeni: ${score}`, msg), 300);
         }
 
@@ -2579,101 +3816,241 @@
         };
       }
 
-      // ---- Quiz ----
-      // EDIT ME: personalize these questions, options, and correct answers
-      const QUIZ_QUESTIONS = [
-        {
-          q: "Kada smo prvi put pričali?",
-          options: [
-            "U februaru",
-            "Na nečijem rođendanu",
-            "Slučajno",
-            "Ne sećam se, a trebalo bi",
-          ],
-          correct: 0,
-        },
-        {
-          q: "Šta najčešće radimo kasno uveče?",
-          options: [
-            "Igramo igrice",
-            "Pričamo gluposti",
-            "Oboje",
-            "Spavamo (retko)",
-          ],
-          correct: 2,
-        },
-        {
-          q: "Koja je moja omiljena fora da te nasmejem?",
-          options: [
-            "Loši vicevi",
-            "Glasovi",
-            "Ozbiljno lice pa iznenadna glupost",
-            "Sve gore navedeno",
-          ],
-          correct: 3,
-        },
-      ];
+      const SIMA_IMAGE = "assets/sima.png";
+      const SIMA_GAME_DURATION = 25;
+      const SIMA_LIVES = 1;
 
-      function startQuizGame() {
-        let index = 0,
-          score = 0,
-          pendingTimeout = null;
+      function startSimaGame() {
+        gameContainer.innerHTML = `
+          <p class="game-title">Sima u svemiru 🛸</p>
+          <p class="game-subtitle">Izbegavaj komete. Preživi ${SIMA_GAME_DURATION} sekundi.</p>
+          <div class="sima-stage" id="dodgeStage">
+            <div class="dodge-ship" id="dodgeShip">
+              <img src="${SIMA_IMAGE}" alt="Sima" id="dodgeShipImg" />
+            </div>
+          </div>
+          <div class="sima-hud">
+            <span id="dodgeLives">🖤</span>
+            <span id="dodgeTime">Vreme: ${SIMA_GAME_DURATION}s</span>
+          </div>
+        `;
 
-        renderQuestion();
+        const stage = gameContainer.querySelector("#dodgeStage");
+        const ship = gameContainer.querySelector("#dodgeShip");
+        const shipImg = gameContainer.querySelector("#dodgeShipImg");
+        const livesEl = gameContainer.querySelector("#dodgeLives");
+        const timeEl = gameContainer.querySelector("#dodgeTime");
 
-        function renderQuestion() {
-          const item = QUIZ_QUESTIONS[index];
-          gameContainer.innerHTML = `
-            <p class="game-title">Koliko me poznaješ? 💜</p>
-            <p class="quiz-progress">Pitanje ${index + 1} od ${QUIZ_QUESTIONS.length}</p>
-            <p class="quiz-question">${item.q}</p>
-            <div class="quiz-options" id="quizOptions"></div>
-          `;
-          const optionsEl = gameContainer.querySelector("#quizOptions");
-          item.options.forEach((opt, i) => {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "quiz-option";
-            btn.textContent = opt;
-            btn.addEventListener("click", () => {
-              if (btn.disabled) return;
-              optionsEl
-                .querySelectorAll(".quiz-option")
-                .forEach((o) => (o.disabled = true));
-              if (i === item.correct) {
-                btn.classList.add("correct");
-                score++;
-              } else {
-                btn.classList.add("wrong");
-                optionsEl.children[item.correct].classList.add("correct");
-              }
-              pendingTimeout = setTimeout(() => {
-                index++;
-                if (index < QUIZ_QUESTIONS.length) {
-                  renderQuestion();
-                } else {
-                  const pct = Math.round((score / QUIZ_QUESTIONS.length) * 100);
-                  let msg;
-                  if (pct === 100) msg = "Znaš me bolje nego što mislim. 🖤";
-                  else if (pct >= 60)
-                    msg = "Solidno! Imamo o čemu da pričamo. 😄";
-                  else msg = "Hajde, moramo više da pričamo. 😉";
-                  showGameResult(`${score}/${QUIZ_QUESTIONS.length}`, msg);
-                }
-              }, 900);
-            });
-            optionsEl.appendChild(btn);
+        shipImg.addEventListener("error", () => {
+          ship.innerHTML = "🛸";
+          ship.style.display = "flex";
+          ship.style.alignItems = "center";
+          ship.style.justifyContent = "center";
+          ship.style.fontSize = "2.4rem";
+        });
+
+        let ended = false;
+        let lives = SIMA_LIVES;
+        let timeLeft = SIMA_GAME_DURATION;
+        let shipXFrac = 0.5;
+        const shipSize = 64;
+        let comets = [];
+        let lastSpawn = 0;
+        let spawnInterval = 950;
+        let rafId = null;
+        let tickTimer = null;
+        let invulnerableUntil = 0;
+        let dragging = false;
+        let loopLast = null;
+
+        function getStageRect() {
+          return stage.getBoundingClientRect();
+        }
+
+        function updateShipPosition() {
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const x = clamp(shipXFrac, 0, 1) * usableWidth;
+          ship.style.transform = `translateX(${x}px)`;
+        }
+
+        function setShipXFromClientX(clientX) {
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const relX = clientX - rect.left - shipSize / 2;
+          shipXFrac = clamp(relX / usableWidth, 0, 1);
+          updateShipPosition();
+        }
+
+        function onPointerDown(e) {
+          if (ended) return;
+          dragging = true;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setShipXFromClientX(clientX);
+        }
+        function onPointerMove(e) {
+          if (!dragging || ended) return;
+          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+          setShipXFromClientX(clientX);
+          if (e.cancelable) e.preventDefault();
+        }
+        function onPointerUp() {
+          dragging = false;
+        }
+
+        stage.addEventListener("mousedown", onPointerDown);
+        window.addEventListener("mousemove", onPointerMove);
+        window.addEventListener("mouseup", onPointerUp);
+        stage.addEventListener("touchstart", onPointerDown, { passive: true });
+        stage.addEventListener("touchmove", onPointerMove, { passive: false });
+        stage.addEventListener("touchend", onPointerUp);
+
+        const cometGlyphs = ["☄️", "🪨", "🌑"];
+
+        function spawnComet() {
+          const rect = getStageRect();
+          const size = 26 + Math.random() * 16;
+          const el = document.createElement("span");
+          el.className = "dodge-comet";
+          el.textContent =
+            cometGlyphs[Math.floor(Math.random() * cometGlyphs.length)];
+          el.style.fontSize = size + "px";
+          const x = Math.random() * Math.max(1, rect.width - size);
+          el.style.left = x + "px";
+          el.style.top = "-40px";
+          stage.appendChild(el);
+          comets.push({
+            el,
+            x,
+            y: -40,
+            size,
+            speed:
+              90 + Math.random() * 55 + (SIMA_GAME_DURATION - timeLeft) * 3.2,
           });
         }
 
+        function updateLivesUI() {
+          livesEl.textContent =
+            "🖤".repeat(lives) + "🤍".repeat(Math.max(0, SIMA_LIVES - lives));
+        }
+        updateLivesUI();
+        updateShipPosition();
+
+        function rectsOverlap(ax, ay, aw, ah, bx, by, bw, bh) {
+          return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+        }
+
+        function registerHit() {
+          lives--;
+          updateLivesUI();
+          invulnerableUntil = performance.now() + 1000;
+          ship.classList.add("hit");
+          setTimeout(() => ship.classList.remove("hit"), 350);
+          const shipRect = ship.getBoundingClientRect();
+          spawnBurst(
+            shipRect.left + shipRect.width / 2,
+            shipRect.top + shipRect.height / 2,
+            "255,120,120",
+            14,
+          );
+          if (lives <= 0) endDodgeGame(false);
+        }
+
+        function endDodgeGame(survived) {
+          if (ended) return;
+          ended = true;
+          markGameComplete("sima");
+          cancelAnimationFrame(rafId);
+          clearInterval(tickTimer);
+          comets.forEach((c) => c.el.remove());
+          comets = [];
+          let title, msg;
+          if (survived) {
+            title = "Preživeli ste! 🛸";
+            msg = "Sima je uspešno sleteo nazad na Zemlju 🐾";
+          } else {
+            title = "Kometa je pogodila Simu!";
+            msg = "R.I.P Sima";
+          }
+          setTimeout(() => showGameResult(title, msg, SIMA_IMAGE), 300);
+        }
+
+        function loop(ts) {
+          if (ended) return;
+          if (loopLast === null) loopLast = ts;
+          const dt = Math.min(0.05, (ts - loopLast) / 1000);
+          loopLast = ts;
+
+          if (ts - lastSpawn > spawnInterval) {
+            spawnComet();
+            lastSpawn = ts;
+            spawnInterval = Math.max(420, spawnInterval - 6);
+          }
+
+          const rect = getStageRect();
+          const usableWidth = Math.max(1, rect.width - shipSize);
+          const shipHitbox = {
+            x: clamp(shipXFrac, 0, 1) * usableWidth + 10,
+            y: rect.height - shipSize + 6,
+            w: shipSize - 20,
+            h: shipSize - 24,
+          };
+
+          for (let i = comets.length - 1; i >= 0; i--) {
+            const c = comets[i];
+            c.y += c.speed * dt;
+            c.el.style.top = c.y + "px";
+
+            if (c.y > rect.height + 40) {
+              c.el.remove();
+              comets.splice(i, 1);
+              continue;
+            }
+
+            if (
+              ts > invulnerableUntil &&
+              rectsOverlap(
+                shipHitbox.x,
+                shipHitbox.y,
+                shipHitbox.w,
+                shipHitbox.h,
+                c.x + 5,
+                c.y + 5,
+                c.size - 10,
+                c.size - 10,
+              )
+            ) {
+              c.el.remove();
+              comets.splice(i, 1);
+              registerHit();
+            }
+          }
+
+          rafId = requestAnimationFrame(loop);
+        }
+
+        tickTimer = setInterval(() => {
+          if (ended) return;
+          timeLeft--;
+          timeEl.textContent = `Vreme: ${timeLeft}s`;
+          if (timeLeft <= 0) endDodgeGame(true);
+        }, 1000);
+
+        rafId = requestAnimationFrame(loop);
+
         activeGameCleanup = () => {
-          if (pendingTimeout) clearTimeout(pendingTimeout);
+          ended = true;
+          cancelAnimationFrame(rafId);
+          clearInterval(tickTimer);
+          stage.removeEventListener("mousedown", onPointerDown);
+          window.removeEventListener("mousemove", onPointerMove);
+          window.removeEventListener("mouseup", onPointerUp);
+          stage.removeEventListener("touchstart", onPointerDown);
+          stage.removeEventListener("touchmove", onPointerMove);
+          stage.removeEventListener("touchend", onPointerUp);
         };
       }
 
-      // ---- Photo puzzle ----
-      // EDIT ME: path to your photo (place the file at assets/image.png
-      // next to this HTML file), and the grid size.
       const PUZZLE_IMAGE = "assets/image.jpg";
       const PUZZLE_GRID = 3;
 
@@ -2704,7 +4081,7 @@
         function renderPuzzle() {
           gameContainer.innerHTML = `
             <p class="game-title">Puzla 🧩</p>
-            <p class="game-subtitle">Tapni dva dela da ih zameniš mesta, dok slika ne bude cela.</p>
+            <p class="game-subtitle">Spoji puzlu</p>
             <div class="puzzle-wrap">
               <div class="puzzle-board" id="puzzleBoard" style="--puzzle-grid:${PUZZLE_GRID}"></div>
             </div>
@@ -2768,12 +4145,9 @@
             render();
             if (isSolved(order)) {
               solved = true;
+              markGameComplete("puzzle");
               setTimeout(() => {
-                showGameResult(
-                  "Uspela si! 🧩🖤",
-                  "Cela slika, konačno.",
-                  PUZZLE_IMAGE,
-                );
+                showGameResult("Uspela si! 🧩🖤", "GOATED", PUZZLE_IMAGE);
               }, 700);
             }
           }
@@ -2783,9 +4157,6 @@
         }
       }
 
-      /* =========================================================
-         Main render loop
-         ========================================================= */
       function animate(now) {
         const dt = Math.min(0.05, (now - lastFrame) / 1000);
         lastFrame = now;
@@ -2833,6 +4204,12 @@
         maybeSpawnShootingStar();
         updateAndDrawShootingStars();
         updateAndDrawSparkles();
+        updateAndDrawRingBursts();
+
+        if (!letterCelebrated && letterT >= 0.999) {
+          letterCelebrated = true;
+          triggerLetterCelebration();
+        }
 
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
@@ -2840,6 +4217,7 @@
 
       init();
       computeScrollProgress();
+      updateStoryProgress();
       requestAnimationFrame(animate);
       setTimeout(spawnShootingStar, 900);
       setTimeout(spawnShootingStar, 2600);
