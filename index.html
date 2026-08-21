@@ -7,6 +7,30 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     />
     <title>Za Lolu — Mali Univerzum</title>
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Za Lolu — Mali Univerzum" />
+    <meta
+      property="og:description"
+      content="Mali univerzum napravljen samo za tebe. Otvori i skroluj ↓"
+    />
+    <meta
+      property="og:image"
+      content="/assets/icon.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Za Lolu — Mali Univerzum" />
+    <meta
+      name="twitter:description"
+      content="Mali univerzum napravljen samo za tebe. Otvori i skroluj ↓"
+    />
+    <meta
+      name="twitter:image"
+      content="/assets/icon.png"
+    />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="icon" type="image/png" href="/assets/icon.png" />
     <link
@@ -14,7 +38,6 @@
       rel="stylesheet"
     />
 
-    <!-- Three.js via ES module import map. No build step needed. -->
     <script type="importmap">
       {
         "imports": {
@@ -23,11 +46,8 @@
       }
     </script>
 
-    <!-- EmailJS — lets the "send a letter" form email you directly from
-         the browser, no backend needed. Loaded as a plain script (not a
-         module) so it's available on window.emailjs before the module
-         script below runs. -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script defer src="/_vercel/insights/script.js"></script>
 
     <style>
       :root {
@@ -47,7 +67,10 @@
       * {
         box-sizing: border-box;
       }
-
+#sendLetterButton {
+  white-space: nowrap;
+  font-size: 0.88rem;   /* malo manji da lakše stane u jedan red */
+}
       html,
       body {
         margin: 0;
@@ -245,6 +268,79 @@
         color: var(--text-muted);
         animation: floatCue 2.6s ease-in-out infinite;
       }
+      .story-progress {
+        position: fixed;
+        right: 22px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      .story-progress.visible {
+        opacity: 1;
+      }
+      .story-progress::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 5px;
+        bottom: 5px;
+        width: 1px;
+        background: rgba(238, 241, 255, 0.15);
+        transform: translateX(-50%);
+        z-index: -1;
+      }
+      .story-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: rgba(238, 241, 255, 0.28);
+        border: 1px solid rgba(238, 241, 255, 0.3);
+        transition:
+          background 0.4s ease,
+          transform 0.4s ease,
+          box-shadow 0.4s ease,
+          border-color 0.4s ease;
+      }
+      .story-dot.filled {
+        background: var(--accent-glow);
+        border-color: var(--accent-glow);
+      }
+      .story-dot.active {
+        transform: scale(1.5);
+        background: var(--star-pale);
+        border-color: var(--star-pale);
+        box-shadow: 0 0 10px rgba(203, 180, 255, 0.75);
+      }
+
+      @media (max-width: 640px) {
+        .story-progress {
+          right: 14px;
+          gap: 11px;
+        }
+        .story-dot {
+          width: 6px;
+          height: 6px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .story-dot {
+          transition:
+            background 0.2s linear,
+            border-color 0.2s linear;
+        }
+        .story-dot.active {
+          transform: none;
+        }
+      }
+
       @keyframes floatCue {
         0%,
         100% {
@@ -359,7 +455,6 @@
         }
       }
 
-      /* ---------- Mini-games section ---------- */
       .phase-games {
         min-height: 100vh;
         padding-bottom: 14vh;
@@ -456,6 +551,18 @@
         flex-shrink: 0;
         filter: drop-shadow(0 0 8px rgba(203, 180, 255, 0.45));
       }
+      .game-card-icon-img {
+          width: 2.5rem;
+          height: 2.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+      .game-card-icon-img img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+      }
       .game-card-text {
         display: flex;
         flex-direction: column;
@@ -471,7 +578,6 @@
         line-height: 1.4;
       }
 
-      /* ---------- Game overlay ---------- */
       .game-overlay {
         position: fixed;
         inset: 0;
@@ -540,7 +646,6 @@
         }
       }
 
-      /* unlocked animation */
       .phase-cake.unlocked .lock-icon {
         transform: scale(0) rotate(30deg);
         opacity: 0;
@@ -574,7 +679,6 @@
         line-height: 1.5;
       }
 
-      /* Memory game */
       .memory-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -622,7 +726,6 @@
         text-align: center;
       }
 
-      /* Star catcher */
       .catcher-stage {
         position: relative;
         height: 320px;
@@ -652,7 +755,6 @@
         margin-top: 0.7rem;
       }
 
-      /* Nahrani Simu */
       .sima-stage {
         position: relative;
         height: 340px;
@@ -711,7 +813,6 @@
         margin-top: 0.7rem;
       }
 
-      /* Sima u svemiru — drag-to-dodge ship + comets */
       .dodge-ship {
         position: absolute;
         bottom: 6px;
@@ -747,7 +848,6 @@
         filter: drop-shadow(0 0 6px rgba(255, 150, 120, 0.55));
       }
 
-      /* Shared result screen */
       .game-result {
         text-align: center;
         padding-top: 0.6rem;
@@ -796,7 +896,6 @@
         border: 1px solid rgba(203, 180, 255, 0.35);
         box-shadow: none !important;
       }
-      /* Photo puzzle */
       .puzzle-wrap {
         display: flex;
         flex-direction: column;
@@ -841,7 +940,6 @@
         font-size: 0.78rem;
       }
 
-      /* ---------- Birthday cake ---------- */
       .cake-inner {
         max-width: 520px;
       }
@@ -874,37 +972,45 @@
         display: flex;
       }
 
-      .cake-scene {
-        position: relative;
-        width: 100%;
-        max-width: 340px;
-        margin: 2rem auto 0.6rem;
-      }
-      .candle-row {
-        position: relative;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 6px 4px;
-        padding: 0 6px;
-        min-height: 64px;
-        align-items: flex-end;
-      }
-      .candle {
-        position: relative;
-        width: 6px;
-        height: 34px;
-        border-radius: 2px;
-        background: linear-gradient(180deg, #fff2df, #e7c98f);
-        border: none;
-        padding: 0;
-        cursor: pointer;
-        flex-shrink: 0;
-        pointer-events: auto;
-        opacity: 0;
-        transform: translateY(10px) scale(0.7);
-        animation: candlePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      }
+.cake-scene {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  margin: 3.2rem auto 0.6rem;
+}
+
+.candle-row {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%) translateY(4px);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 2px;
+  width: 54%;
+  max-width: 176px;
+  z-index: 5;
+  padding: 0;
+}
+     .candle {
+  position: relative;
+  flex: 1 1 0;
+  width: auto;
+  min-width: 2px;
+  max-width: 6px;
+  height: 26px;
+  border-radius: 1px;
+  background: linear-gradient(180deg, #fff2df, #e7c98f);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(10px) scale(0.7);
+  animation: candlePop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
       @keyframes candlePop {
         to {
           opacity: 1;
@@ -912,27 +1018,25 @@
         }
       }
       .candle-flame {
-        position: absolute;
-        left: 50%;
-        bottom: 100%;
-        transform: translateX(-50%);
-        width: 10px;
-        height: 16px;
-        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-        background: radial-gradient(
-          circle at 50% 70%,
-          #fff6d8 0%,
-          var(--accent-gold) 45%,
-          rgba(255, 150, 90, 0.9) 80%,
-          rgba(255, 100, 60, 0) 100%
-        );
-        filter: drop-shadow(0 0 6px rgba(255, 210, 140, 0.85));
-        animation: flameFlicker 1.6s ease-in-out infinite;
-        transition:
-          opacity 0.25s ease,
-          transform 0.25s ease;
-        pointer-events: none;
-      }
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  width: 5px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(
+    circle at 50% 70%,
+    #fff6d8 0%,
+    var(--accent-gold) 45%,
+    rgba(255, 150, 90, 0.9) 80%,
+    rgba(255, 100, 60, 0) 100%
+  );
+  filter: drop-shadow(0 0 5px rgba(255, 210, 140, 0.85));
+  animation: flameFlicker 1.6s ease-in-out infinite;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
       @keyframes flameFlicker {
         0%,
         100% {
@@ -950,18 +1054,18 @@
         transform: translateX(-50%) translateY(6px) scale(0.4);
         animation: none;
       }
-      .candle-smoke {
-        position: absolute;
-        left: 50%;
-        bottom: 100%;
-        transform: translateX(-50%);
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: rgba(220, 220, 230, 0.6);
-        opacity: 0;
-        pointer-events: none;
-      }
+.candle-smoke {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(220, 220, 230, 0.6);
+  opacity: 0;
+  pointer-events: none;
+}
       .candle.blown .candle-smoke {
         animation: smokeRise 0.9s ease-out forwards;
       }
@@ -976,61 +1080,107 @@
         }
       }
 
-      .cake-body {
-        position: relative;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .cake-tier {
-        width: 78%;
-        border-radius: 14px;
-        background: linear-gradient(
-          180deg,
-          #f4e3ff 0%,
-          var(--accent-glow) 100%
-        );
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow:
-          inset 0 -10px 18px rgba(90, 50, 140, 0.25),
-          0 10px 24px rgba(0, 0, 0, 0.3);
-        position: relative;
-      }
-      .cake-tier::before {
-        content: "";
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        right: 6px;
-        height: 8px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.55);
-      }
-      .cake-tier-top {
-        height: 46px;
-        margin-bottom: -4px;
-        z-index: 2;
-      }
-      .cake-tier-bottom {
-        width: 100%;
-        height: 62px;
-        background: linear-gradient(
-          180deg,
-          #ffe9c6 0%,
-          var(--accent-gold) 100%
-        );
-        z-index: 1;
-      }
-      .cake-plate {
-        width: 92%;
-        height: 10px;
-        border-radius: 50%;
-        background: rgba(238, 241, 255, 0.18);
-        box-shadow: 0 6px 18px rgba(203, 180, 255, 0.2);
-        margin-top: 2px;
-      }
+.cake-body {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 1;
+}
 
+
+.cake-tier {
+  position: relative;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.5),
+    inset 0 -14px 20px rgba(90, 50, 140, 0.28),
+    inset 8px 0 16px rgba(255, 255, 255, 0.12),
+    inset -8px 0 16px rgba(0, 0, 0, 0.15),
+    0 12px 20px rgba(0, 0, 0, 0.35);
+}
+
+
+.cake-tier::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: -2px;
+  right: -2px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.85);
+  clip-path: polygon(
+    0% 40%, 4% 65%, 9% 35%, 14% 68%, 19% 30%, 24% 62%,
+    29% 32%, 34% 70%, 39% 28%, 44% 65%, 49% 35%,
+    54% 68%, 59% 30%, 64% 64%, 69% 33%, 74% 70%,
+    79% 28%, 84% 66%, 89% 32%, 94% 68%, 100% 40%,
+    100% 100%, 0% 100%
+  );
+  border-radius: 8px 8px 0 0;
+  filter: drop-shadow(0 -1px 2px rgba(120, 80, 40, 0.15));
+}
+
+.cake-tier-top {
+  width: 56%;
+  height: 44px;
+  margin-bottom: -4px;
+  z-index: 3;
+  background: linear-gradient(180deg, #fbf1ff 0%, #e8d4ff 35%, var(--accent-glow) 100%);
+}
+.cake-tier-top::after {
+  content: "";
+  position: absolute;
+  inset: 10px 8px 5px;
+  border-radius: 6px;
+  background-image:
+    radial-gradient(circle, #ffe3b0 3px, transparent 3.2px),
+    radial-gradient(circle, #b9c8ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffc8d6 3px, transparent 3.2px),
+    radial-gradient(circle, #eef1ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffe3b0 3px, transparent 3.2px),
+    radial-gradient(circle, #b9c8ff 3px, transparent 3.2px),
+    radial-gradient(circle, #ffc8d6 3px, transparent 3.2px);
+  background-size: 16.6% 100%;
+  background-repeat: no-repeat;
+  background-position:
+    4% 25%, 18% 70%, 32% 15%, 46% 65%, 60% 20%, 74% 68%, 90% 30%;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.cake-tier-mid {
+  width: 70%;
+  height: 50px;
+  margin-bottom: -4px;
+  z-index: 2;
+  background: linear-gradient(180deg, #fff3e5 0%, #ffdcb8 35%, #ffcfa3 100%);
+}
+.cake-tier-bottom {
+  width: 84%;
+  height: 58px;
+  z-index: 1;
+  background: linear-gradient(180deg, #fff0d4 0%, #ffe0a8 35%, var(--accent-gold) 100%);
+}
+
+.cake-plate {
+  position: relative;
+  width: 100%;
+  height: 14px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, rgba(238, 241, 255, 0.35), rgba(238, 241, 255, 0.08));
+  box-shadow:
+    0 2px 0 rgba(255, 255, 255, 0.15) inset,
+    0 18px 30px 4px rgba(0, 0, 0, 0.45);
+  margin-top: 6px;
+}
+.cake-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.25), transparent 70%);
+}
       .cake-counter {
         margin-top: 1.1rem;
         font-family: var(--display-font);
@@ -1044,12 +1194,13 @@
       }
 
       .cake-celebration {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 1.6rem;
-        animation: resultImageReveal 0.7s ease both;
-      }
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.6rem;
+  animation: resultImageReveal 0.7s ease both;
+}
+
       .cake-unlocked.all-blown .cake-scene,
       .cake-unlocked.all-blown .cake-counter,
       .cake-unlocked.all-blown #blowAllButton,
@@ -1060,14 +1211,18 @@
       .cake-unlocked.all-blown .cake-celebration {
         display: flex;
       }
-      .cake-celebration .cta-button {
-        margin-top: 0.4rem;
-      }
-      .cake-celebration .cta-button + .cta-button {
-        margin-top: 0.7rem;
-      }
+      .cake-celebration .subtext {
+  margin-bottom: 2.4rem;   /* bio 1.3rem — veći razmak pre dugmadi */
+}
+     .cake-celebration .cta-button {
+  margin-top: 0;            /* prvo dugme ne treba dodatni top-margin, subtext ga već razdvaja */
+  width: 100%;
+  max-width: 280px;         /* opciono — da dugmad ne budu preširoka na desktopu */
+}
+     .cake-celebration .cta-button + .cta-button {
+  margin-top: 1.1rem;       /* bilo 0.7rem — veći razmak između samih dugmadi */
+}
 
-      /* ---------- Confetti ---------- */
       .confetti-piece {
         position: fixed;
         top: -24px;
@@ -1100,7 +1255,6 @@
         }
       }
 
-      /* ---------- Letter overlay (read letter + send letter) ---------- */
       .letter-overlay {
         position: fixed;
         inset: 0;
@@ -1160,7 +1314,6 @@
         opacity: 1;
       }
       .letter-paper::before {
-        /* torn/deckled edge illusion */
         content: "";
         position: absolute;
         inset: 8px;
@@ -1249,11 +1402,15 @@
     </style>
   </head>
   <body>
-    <!-- Three.js renderer canvas gets mounted inside this div -->
     <div id="sky" aria-hidden="true"></div>
     <div id="tooltip" role="status"></div>
     <div id="wishToast" role="status"></div>
-
+    <nav class="story-progress" id="storyProgress" aria-hidden="true">
+      <span class="story-dot" data-phase="1"></span>
+      <span class="story-dot" data-phase="2"></span>
+      <span class="story-dot" data-phase="3"></span>
+      <span class="story-dot" data-phase="4"></span>
+    </nav>
     <main>
       <section class="phase phase-1" data-phase="1">
         <div class="phase-inner">
@@ -1263,8 +1420,8 @@
 
           <p class="subtext">
             Nismo imali priliku da napravimo mnogo velikih uspomena, ali smo
-            imali neke trenutke koji su mi značili. Zato sam napravio
-            ovo mesto gde mogu da ih sačuvam.
+            imali neke trenutke koji su mi značili. Zato sam napravio ovo mesto
+            gde mogu da ih sačuvam.
           </p>
 
           <div class="scroll-cue">skroluj ↓</div>
@@ -1274,7 +1431,6 @@
       <section class="phase phase-2" data-phase="2">
         <div class="phase-inner">
           <p class="eyebrow">Mali poklon za veliki dan.</p>
-          <!-- EDIT ME: mid-scroll line -->
           <h1 class="headline">
             Ponekad neko uđe u naš život na kratko, ali dovoljno da svakodnevicu
             učini lepšom.
@@ -1286,15 +1442,13 @@
       <section class="phase phase-3" data-phase="3">
         <div class="phase-inner">
           <p class="eyebrow">Ove zvezde nisu random ovde.</p>
-          <!-- EDIT ME: transition line -->
-          <h1 class="headline">Žele da ti kažu nešto.</h1>
+          <h1 class="headline">Sve zvezde su povezane.</h1>
         </div>
       </section>
 
       <section class="phase phase-4" data-phase="4">
-        <h2 class="sr-only-heading">Srecan rodjedan Lola</h2>
+        <h2 class="sr-only-heading">Srećan rodjedan Lola</h2>
         <div class="phase-inner">
-          <!-- EDIT ME: closing note -->
           <p class="final-note">
             Srećan rođendan, Lola.<br />
             <span class="subtext"
@@ -1307,7 +1461,6 @@
 
       <section class="phase phase-games" data-phase="5">
         <div class="phase-inner games-inner ui-surface">
-          <!-- <p class="eyebrow">bonus za rođendan</p> -->
           <h1 class="headline">Mini igre</h1>
           <p class="subtext">Izaberi igru</p>
 
@@ -1328,15 +1481,15 @@
                 >
               </span>
             </button>
-            <button class="game-card" data-game="sima" type="button">
-              <span class="game-card-icon">🛸</span>
-              <span class="game-card-text">
-                <span class="game-card-title">Sima u svemiru</span>
-                <span class="game-card-desc"
-                  >Pomogni simi da sleti</span
-                >
-              </span>
-            </button>
+           <button class="game-card" data-game="sima" type="button">
+  <span class="game-card-icon game-card-icon-img">
+    <img src="assets/sima.png" alt="" />
+  </span>
+  <span class="game-card-text">
+    <span class="game-card-title">Sima in space</span>
+    <span class="game-card-desc">Pomogni simi da sleti</span>
+  </span>
+</button>
             <button class="game-card" data-game="puzzle" type="button">
               <span class="game-card-icon">🧩</span>
               <span class="game-card-text">
@@ -1353,7 +1506,6 @@
           <div class="cake-locked" id="cakeLocked">
             <p class="eyebrow">iznenađenje</p>
 
-            <!-- <h1 class="headline">Negde se krije torta…</h1> -->
             <p class="subtext">Odigraj sve četri mini igre da je otključaš.</p>
             <div class="lock-container">
               <div class="lock-icon">🔒</div>
@@ -1362,20 +1514,18 @@
           </div>
 
           <div class="cake-unlocked" id="cakeUnlocked">
-            <!-- <p class="eyebrow">19. rođendan</p> -->
-            <h1 class="headline" id="cakeHeadline">Zamisli želju i duni svećice</h1>
-            <!-- <p class="subtext" id="cakeInstructions">
-              Zatvori oči na sekund, zamisli želju, pa tapni svaku svećicu da je
-              ugasiš — ili dunuti sve odjednom.
-            </p> -->
+            <h1 class="headline" id="cakeHeadline">
+              Zamisli želju i duni svećice
+            </h1>
 
             <div class="cake-scene" id="cakeScene">
               <div class="candle-row" id="candleRow"></div>
               <div class="cake-body">
-                <div class="cake-tier cake-tier-top"></div>
-                <div class="cake-tier cake-tier-bottom"></div>
-                <div class="cake-plate"></div>
-              </div>
+  <div class="cake-tier cake-tier-top"></div>
+  <div class="cake-tier cake-tier-mid"></div>
+  <div class="cake-tier cake-tier-bottom"></div>
+  <div class="cake-plate"></div>
+</div>
             </div>
 
             <p class="cake-counter" id="cakeCounter">19 svećica čeka</p>
@@ -1388,13 +1538,12 @@
             </button>
 
             <div class="cake-celebration" id="cakeCelebration">
-              <p class="final-note">Srećan rođendan, Lola! 🎉🖤</p>
+              <p class="final-note">Srećan rođendan! 🎉🖤</p>
               <p class="subtext">
-                Zelim ti puno srece, da ostvaris sve sto zelis i da te u zivotu
-                prate ljudi koji ce umeti da te vole na nacin koji zasluzujes.
+                Želim ti puno sreće, da ostvariš sve što poželiš, i da uvek budes okružena ljudima koji znaju koliko vrediš.
               </p>
               <button class="cta-button" id="wishButton" type="button">
-                Zamisli želju 🖤
+                Pošalji želju u univerzum 🌠
               </button>
               <button
                 class="cta-button game-secondary-btn"
@@ -1430,7 +1579,6 @@
       </div>
     </div>
 
-    <!-- Read-only letter, styled like an old piece of paper -->
     <div
       class="letter-overlay ui-surface"
       id="letterOverlay"
@@ -1445,20 +1593,16 @@
         >
           ✕
         </button>
-        <div class="letter-seal">🕯️</div>
+        <div class="letter-seal">🌌</div>
         <p class="letter-heading">
           26.7.2026. dan kad su nove zvezde prestale da sijaju
         </p>
         <p class="letter-text">
-          <!-- EDIT ME: napiši ovde svoje pismo za nju. Ostavi prazne linije
-               (\n\n) tamo gde želiš pasus, tekst se prikazuje tačno kako je
-               napisan. -->
-          Mozda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile udaljene i sede nasmejane gledajuci u mnogo vece sazvezdje
+          Možda u nekom drugom univerzumu dve planete nisu odustale jedna od druge kolko god bile udaljene i sede nasmejane gledajući u mnogo veće sazveždje
         </p>
       </div>
     </div>
 
-    <!-- Form for her to write her own letter and send it into the universe -->
     <div
       class="letter-overlay ui-surface"
       id="sendLetterOverlay"
@@ -1503,10 +1647,6 @@
 
     <script type="module">
       import * as THREE from "three";
-
-      /* =========================================================
-         CONFIG — identical values/behaviour to the canvas version
-         ========================================================= */
       const CONFIG = {
         starCount: 260,
         letterMinStars: 700,
@@ -1529,28 +1669,15 @@
         finalGlowStart: 0.8,
       };
 
-      // Stars no longer sit at full brightness the moment the page loads —
-      // each one has its own little "reveal window" inside the early part of
-      // the scroll, and the whole field keeps deepening/brightening a bit
-      // further as you keep scrolling, so the sky feels like it's being
-      // uncovered rather than dumped on screen all at once.
-      const APPEAR_SCROLL_END = 0.5; // by this scroll progress, every star has appeared
-      const APPEAR_FADE_WIDTH = 0.22; // how long (in scroll progress) each star takes to fade in
-      const SHINE_MIN = 0.5; // overall dimness at the very top of the page
-      const SHINE_SCROLL_RANGE = 0.6; // scroll progress over which brightness ramps up to full
-
-      // Slow left/right drift applied only to the deep star layer (not the
-      // background gradient, not shooting stars) — gives a parallax "3D
-      // cosmos" feel: the far backdrop stays put, the star field glides.
+      const APPEAR_SCROLL_END = 0.5;
+      const APPEAR_FADE_WIDTH = 0.22;
+      const SHINE_MIN = 0.5;
+      const SHINE_SCROLL_RANGE = 0.6;
       const PAN_AMPLITUDE = 60;
-      const PAN_SPEED = (2 * Math.PI) / 55; // ~55s for a full left-right cycle
+      const PAN_SPEED = (2 * Math.PI) / 55;
       const WRAP_MARGIN = PAN_AMPLITUDE + 40;
       let globalPanOffset = 0;
-      let currentLetterT = 0; // 0 = pure background, 1 = letter fully formed
-
-      // Only background stars drift with the parallax pan. Letter stars fade
-      // that drift out to exactly 0 as they lock into the message, so the
-      // formed text always ends up perfectly centered and stationary.
+      let currentLetterT = 0;
       function starDrawX(s) {
         return s.x + globalPanOffset * (s.isLetter ? 1 - currentLetterT : 1);
       }
@@ -1564,6 +1691,7 @@
         "Ova zvezda pamti svaki kanter koji smo odigrali",
         "Ova zvezda pamti svaki ulepsan dan",
         "Ova zvezda pamti nas prvi susret",
+        "Ova zvezda pamti svaki put kad si rekla da si ljuta na mene",
         "Ova zvezda pamti svaki put kad si mi rekla da sam bebica",
         "Ova zvezda pamti svaki put kad si mi rekla da ces da me prebijes",
         "Ova zvezda pamti nas prvi odgledan film",
@@ -1571,13 +1699,6 @@
         "Ova zvezda pamti nasu kucu u minecraftu",
       ];
 
-      /* ---------- tooltip message assignment (stable per star) ----------
-         Each star gets ONE message, permanently, the first time it's ever
-         shown — after that, hovering/tapping it again always shows the
-         same text again, no matter how much time passes in between.
-         Messages are still handed out from a shared shuffled deck so that,
-         across DIFFERENT stars, all 13 messages get used once before any
-         repeat and two freshly-assigned stars in a row never collide. */
       let messageQueue = [];
       let lastShownMessage = null;
 
@@ -1592,8 +1713,6 @@
 
       function refillMessageQueue() {
         messageQueue = shuffleMessages(STAR_MESSAGES);
-        // guard the seam: don't let the last message of the old cycle
-        // immediately repeat as the first of the new cycle
         if (messageQueue.length > 1 && messageQueue[0] === lastShownMessage) {
           const swapIdx =
             1 + Math.floor(Math.random() * (messageQueue.length - 1));
@@ -1610,11 +1729,6 @@
         lastShownMessage = msg;
         return msg;
       }
-
-      // Draws a fresh message from the shared deck only the first time a
-      // given star is shown, then stores it on the star itself — every
-      // later hover/tap of that same star (this session, or any time in
-      // the future) returns exactly the same text.
       function getMessageForStar(star) {
         if (star.assignedMessage === null) {
           star.assignedMessage = nextTooltipMessage();
@@ -1623,10 +1737,9 @@
       }
 
       const WISH_MESSAGES = [
-        "Mala želja, posađena ✨",
+        "Mala želja, postavljena ✨",
         "Ova je sada tvoja 🌟",
         "Nebo je upravo postalo malo lepše ✨",
-        // "Mala zvezda za malu želju",
         "Poslato u nebo 🎉",
         "Još jedna zvezda u tvom univerzumu ✨",
       ];
@@ -1634,8 +1747,7 @@
       const SHOOTING_MESSAGES = [
         "Uhvatila si jednu — zamisli želju! 🌠",
         "Želja zamisljena ✨",
-        "To je srećna zvezda",
-        "Brzo, zamisli želju!",
+        "Brzo zamisli želju!",
       ];
 
       const HUE_COLORS = {
@@ -1680,9 +1792,6 @@
         return arr[Math.floor(Math.random() * arr.length)];
       }
 
-      /* =========================================================
-         THREE.JS SCENE
-         ========================================================= */
       const scene = new THREE.Scene();
       const camera = new THREE.OrthographicCamera(0, 1, 0, 1, -1000, 1000);
       camera.position.z = 10;
@@ -1695,9 +1804,6 @@
       renderer.setClearColor(0x05061a, 1);
       skyContainer.appendChild(renderer.domElement);
 
-      /* ---------- shared shaders ---------- */
-      // rgba line material — used for constellation links, letter links,
-      // and shooting-star trails. Vertex-level rgba, no textures needed.
       const lineVertexShader = `
         attribute vec4 aColor;
         varying vec4 vColor;
@@ -1744,7 +1850,6 @@
       }
       const softCircleTexture = generateSoftCircleTexture(256);
 
-      /* ---------- background (sky gradient + nebulae + galaxy band + dust) ---------- */
       const bgMaterial = new THREE.ShaderMaterial({
         uniforms: {
           uResolution: { value: new THREE.Vector2(1, 1) },
@@ -1823,7 +1928,6 @@
       bgMesh.frustumCulled = false;
       scene.add(bgMesh);
 
-      /* ---------- stars (Points, halo+core in one shader) ---------- */
       const starsVertexShader = `
         attribute float aAlpha;
         attribute vec3 aColor;
@@ -1891,11 +1995,9 @@
 
       let starsPoints = null;
       let starsGeo = null;
-      let starList = []; // parallel JS-side data, mirrors the old Star objects
+      let starList = [];
       let starCapacity = 0;
       let activeStarCount = 0;
-
-      /* ---------- constellation + letter connection lines ---------- */
       const maxLinksPerStarBudget = CONFIG.linksPerStar;
       let constellationGeo, constellationLines;
       let letterGeo, letterLines;
@@ -1929,7 +2031,6 @@
         col[idx * 4 + 3] = a;
       }
 
-      /* ---------- hover ring ---------- */
       const ringSegs = 32;
       const ringPosArr = new Float32Array((ringSegs + 1) * 3);
       for (let i = 0; i <= ringSegs; i++) {
@@ -1956,7 +2057,6 @@
       ringMesh.frustumCulled = false;
       scene.add(ringMesh);
 
-      /* ---------- final aura sprite ---------- */
       const auraMaterial = new THREE.SpriteMaterial({
         map: softCircleTexture,
         color: 0xcbb4ff,
@@ -1970,15 +2070,7 @@
       auraSprite.frustumCulled = false;
       scene.add(auraSprite);
 
-      /* ---------- shooting stars (tapered comet mesh + glowing head) ----------
-         NOTE: a plain THREE.Line renders at a hard 1px width on most GPUs/
-         browsers (WebGL clamps gl.lineWidth), which made the old trail all
-         but invisible. A thin tapered triangle + additive blending gives a
-         real, clearly visible comet streak instead. */
       let shootingStarsList = [];
-
-      // Small palette of comet hues — chosen at spawn time so shooting
-      // stars read as a little more varied than a single fixed white/gold.
       const SHOOTING_COLOR_SETS = [
         { trail: [1, 1, 1], head: 0xffffff },
         { trail: [203 / 255, 180 / 255, 1], head: 0xcbb4ff },
@@ -2018,8 +2110,6 @@
         const mesh = new THREE.Mesh(geo, makeCometMaterial());
         mesh.renderOrder = 6;
         mesh.frustumCulled = false;
-        // shooting stars fly in raw screen space, independent of the
-        // slow-drifting deep star field, so they read as "closer" objects
         scene.add(mesh);
 
         const headMat = new THREE.SpriteMaterial({
@@ -2144,7 +2234,6 @@
         return false;
       }
 
-      /* ---------- sparkles (burst particles) ---------- */
       const MAX_SPARKLES = 800;
       const sparkleVertexShader = `
         attribute float aAlpha;
@@ -2266,11 +2355,6 @@
         sparkleGeo.attributes.aRadius.needsUpdate = true;
       }
 
-      /* ---------- expanding ring bursts (key-moment feedback) ----------
-         A short-lived, outward-expanding, fading ring — used to punctuate
-         moments that matter (planting a wish, catching a shooting star,
-         blowing a candle, finishing a mini-game, the final celebration)
-         without relying only on the particle burst. */
       let ringBurstList = [];
 
       function spawnRingBurst(x, y, colorHex, opts) {
@@ -2313,11 +2397,6 @@
         }
       }
 
-      /* =========================================================
-         Letter-shape sampling (unchanged technique — offscreen 2D
-         canvas used purely to rasterize text and sample pixel
-         positions; nothing to do with the renderer)
-         ========================================================= */
       function generateLetterTargets(width, height, text) {
         const off = document.createElement("canvas");
         off.width = width;
@@ -2445,10 +2524,6 @@
         };
       }
 
-      /* =========================================================
-         Star class (JS-side data only — GPU buffers are written
-         from this each frame)
-         ========================================================= */
       class Star {
         constructor(x, y) {
           this.x = x;
@@ -2467,19 +2542,11 @@
           this.vx = (Math.random() - 0.5) * driftScale;
           this.vy = (Math.random() - 0.5) * driftScale;
           this.hue = Math.random() < 0.7 ? "pale" : "blue";
-          // Each star gets its own point along the scroll where it begins
-          // to fade in, so the field reveals itself gradually rather than
-          // popping in all at once on load.
           this.appearThreshold = Math.random();
-          // Stable per-star tooltip text — assigned the first time this
-          // star is ever shown, then kept for the star's whole lifetime.
           this.assignedMessage = null;
         }
       }
 
-      /* =========================================================
-         Build / rebuild the whole starfield + GPU buffers
-         ========================================================= */
       function buildStars() {
         if (starsPoints) {
           scene.remove(starsPoints);
@@ -2493,7 +2560,7 @@
         );
         letterSpacing = spacing;
         const totalStars = Math.max(CONFIG.starCount, targets.length + 60);
-        starCapacity = totalStars + 400; // headroom for wish stars planted later
+        starCapacity = totalStars + 400;
 
         starList = [];
         for (let i = 0; i < totalStars; i++) {
@@ -2509,8 +2576,6 @@
           star.isLetter = true;
           star.targetX = sortedTargets[i].x;
           star.targetY = sortedTargets[i].y;
-          // legibility floor: a letter star should never be too dim/small
-          // to read, no matter how sparse its local neighborhood is
           star.radius = Math.max(star.radius, 1.35);
           star.baseBrightness = Math.max(star.baseBrightness, 0.72);
         });
@@ -2557,7 +2622,6 @@
           ),
         );
 
-        // static-ish attributes filled once per star (only appended to later)
         const colorArr = starsGeo.attributes.aColor.array;
         const radiusArr = starsGeo.attributes.aRadius.array;
         const isWishArr = starsGeo.attributes.aIsWish.array;
@@ -2585,8 +2649,6 @@
         starsPoints.renderOrder = 2;
         starsPoints.frustumCulled = false;
         scene.add(starsPoints);
-
-        // (re)allocate constellation + letter connection line buffers
         const maxConstellationVerts = totalStars * CONFIG.linksPerStar * 2;
         if (constellationLines) {
           scene.remove(constellationLines);
@@ -2631,8 +2693,6 @@
         star.vx = 0;
         star.vy = 0;
         star.radius = 1.6 + Math.random() * 0.8;
-        // planted by a direct tap/click, so it should shine right away
-        // instead of waiting on the scroll-driven reveal window
         star.appearThreshold = 0;
         starList.push(star);
         starsGeo._writeStaticStarAttrs(activeStarCount, star);
@@ -2648,21 +2708,10 @@
         showToast(pick(WISH_MESSAGES), 1900);
       }
 
-      /* =========================================================
-         Per-frame star update: position + twinkle alpha only.
-         (Color / radius / flags are static once written, which is
-         the main win over the canvas version — no per-star gradient
-         fills every frame, just cheap attribute buffer writes.)
-         ========================================================= */
       function updateStars(letterT, finalGlowT) {
         currentLetterT = letterT;
         const pos = starsGeo.attributes.position.array;
         const alp = starsGeo.attributes.aAlpha.array;
-
-        // Global "sky brightening" factor: the whole field starts a bit
-        // dim/muted at the very top of the page and deepens into its full
-        // brightness as the person keeps scrolling — reinforces the sense
-        // that scrolling is what's revealing the universe.
         const shineBoost = lerp(
           SHINE_MIN,
           1,
@@ -2700,10 +2749,6 @@
           const wishPulse = s.isWish
             ? 0.85 + 0.15 * Math.sin(time * 1.6 + s.twinkleSeed)
             : 1;
-
-          // Staggered scroll-driven reveal: each star fades in over its own
-          // window inside the early part of the scroll, instead of every
-          // star being fully visible the instant the page loads.
           let appearAlpha = 1;
           if (!s.isWish) {
             const windowStart =
@@ -2837,9 +2882,6 @@
         letterGeo.attributes.aColor.needsUpdate = true;
       }
 
-      // Fires exactly once, the moment the scattered stars finish lerping
-      // into the "SRECAN RODJEDAN LOLA" message — a little payoff for
-      // having scrolled all the way there.
       let letterCelebrated = false;
 
       function triggerLetterCelebration() {
@@ -2916,9 +2958,6 @@
         auraMaterial.opacity = 0.5 * finalGlowT;
       }
 
-      /* =========================================================
-         Sizing / camera
-         ========================================================= */
       function resizeRendererAndCamera() {
         W = window.innerWidth;
         H = window.innerHeight;
@@ -2956,9 +2995,6 @@
         }, 220);
       });
 
-      /* =========================================================
-         Scroll-driven story progress (unchanged)
-         ========================================================= */
       const phase4El = document.querySelector(".phase-4");
 
       function computeScrollProgress() {
@@ -2967,6 +3003,37 @@
           : document.documentElement.scrollHeight;
         const storyMax = Math.max(1, storyEnd - window.innerHeight);
         scrollProgress = clamp(window.scrollY / storyMax, 0, 1);
+      }
+
+      const storyProgressEl = document.getElementById("storyProgress");
+      const storyDots = storyProgressEl
+        ? Array.from(storyProgressEl.querySelectorAll(".story-dot"))
+        : [];
+      const storyPhaseEls = Array.from(
+        document.querySelectorAll(
+          '.phase[data-phase="1"], .phase[data-phase="2"], .phase[data-phase="3"], .phase[data-phase="4"]',
+        ),
+      );
+
+      function updateStoryProgress() {
+        if (!storyProgressEl || storyPhaseEls.length === 0) return;
+
+        const viewportCenter = window.scrollY + window.innerHeight / 2;
+        let activeIndex = 0;
+
+        storyPhaseEls.forEach((el, i) => {
+          const top = el.offsetTop;
+          if (viewportCenter >= top) activeIndex = i;
+        });
+
+        const pastStory = scrollProgress >= 0.985;
+        const atVeryTop = window.scrollY < 40;
+        storyProgressEl.classList.toggle("visible", !pastStory && !atVeryTop);
+
+        storyDots.forEach((dot, i) => {
+          dot.classList.toggle("active", i === activeIndex);
+          dot.classList.toggle("filled", i < activeIndex);
+        });
       }
 
       let scrollTicking = false;
@@ -2978,6 +3045,7 @@
           if (!scrollTicking) {
             requestAnimationFrame(() => {
               computeScrollProgress();
+              updateStoryProgress();
               const delta = Math.abs(window.scrollY - lastScrollY);
               const now = performance.now();
               if (delta > 4 && now - lastShootingStarAt > 350) {
@@ -3011,15 +3079,6 @@
         .querySelectorAll(".phase")
         .forEach((section) => revealObserver.observe(section));
 
-      /* =========================================================
-         Tooltip / toast / interaction (unchanged behaviour)
-         ========================================================= */
-      // Selector for "UI surfaces" that must never let clicks/hovers
-      // fall through to the star canvas underneath them — covers real
-      // <button> elements plus opaque interactive panels (mini-game
-      // picker card, the cake card, letter overlays) that have empty
-      // space around their controls where a miss used to leak straight
-      // through to the sky.
       const UI_BLOCK_SELECTOR = "button, .ui-surface";
 
       function findNearestStar(px, py) {
@@ -3059,9 +3118,7 @@
       }
 
       function handleSkyInteraction(x, y, isTapAndHold) {
-        // shooting stars fly in raw screen space (unaffected by the star-field pan)
         if (tryCatchShootingStar(x, y)) return;
-        // hit-testing already compares against each star's real drawn position
         const star = findNearestStar(x, y);
         if (star) {
           hoveredStar = star;
@@ -3072,15 +3129,10 @@
             activeTooltipTimeout = setTimeout(hideTooltip, 3200);
           }
         } else {
-          // planted wish stars are background-layer (non-letter), so they
-          // always get the full drift — store them in un-offset star-space
           plantWishStar(x - globalPanOffset, y);
         }
       }
 
-      // A faint trail of tiny sparkles follows the cursor/finger across the
-      // open sky — distance- and time-throttled so it stays subtle rather
-      // than flooding the sparkle pool.
       let lastTrailTime = 0;
       let lastTrailX = -9999;
       let lastTrailY = -9999;
@@ -3184,17 +3236,14 @@
         { passive: true },
       );
 
-      /* =========================================================
-         Birthday cake — unlocks once all four mini-games have been
-         completed at least once. 19 candles for her 19th; tap each
-         one to blow it out (or blow them all at once), and the last
-         flame going out triggers the final celebration.
-         ========================================================= */
       const GAME_KEYS = ["memory", "catcher", "sima", "puzzle"];
       const CANDLE_COUNT = 19;
       let completedGames = new Set();
       let blownCandles = 0;
-
+   const DEV_PARAMS = new URLSearchParams(window.location.search);
+if (DEV_PARAMS.has("dev") || DEV_PARAMS.has("skip")) {
+  GAME_KEYS.forEach((key) => markGameComplete(key));
+}
       function markGameComplete(key) {
         if (completedGames.has(key)) return;
         completedGames.add(key);
@@ -3217,7 +3266,7 @@
         if (!cakePhase || cakePhase.classList.contains("unlocked")) return;
         cakePhase.classList.add("unlocked");
         buildCandles();
-        showToast("Sve igre su odigrane! Torta te čeka 🎂", 2600);
+        showToast("Odigrala si sve igre 🎂", 2600);
       }
 
       function buildCandles() {
@@ -3299,8 +3348,6 @@
         showToast("Srećan 19. rođendan! 🎉", 2800);
       }
 
-      // Real DOM confetti for the finale — falls, drifts, and spins over
-      // the whole viewport, on top of the star-canvas particle bursts.
       const CONFETTI_COLORS = [
         "#cbb4ff",
         "#ffe3b0",
@@ -3328,9 +3375,6 @@
         }
       }
 
-      // "Zamisli želju" — same fireworks-burst wish gesture the page used
-      // to have on its own screen, now living inside the post-candles
-      // celebration instead.
       function makeWish() {
         for (let i = 0; i < 5; i++) {
           const bx = Math.random() * W;
@@ -3359,25 +3403,9 @@
         });
       }
 
-      /* =========================================================
-         Letter overlays — reading her letter, and sending her own
-         letter "into the universe" (delivered to you by email).
-         ========================================================= */
-
-      // EDIT ME — EmailJS config (from https://www.emailjs.com, free tier).
-      // 1. Create an account, connect an email service (Gmail etc.) →
-      //    copy its "Service ID" into EMAILJS_SERVICE_ID below.
-      // 2. Create an email template with a fixed "To email" = your own
-      //    address, and a body using {{za}} and {{poruka}} (see the two
-      //    variables sent below) → copy its "Template ID".
-      // 3. Account → General → copy your "Public Key".
-      // Leave any of these empty and the form falls back to opening her
-      // email client instead (still reaches you, just needs her to hit
-      // "send" once in her own mail app).
-      const EMAILJS_SERVICE_ID = "service_mvd2zgs"; // e.g. "service_abc1234"
-      const EMAILJS_TEMPLATE_ID = "template_6xvcmid"; // e.g. "template_xyz789"
-      const EMAILJS_PUBLIC_KEY = "YIaU-95-g9f3PV6gO"; // e.g. "AbCdEfGhIjKlMnOp"
-      // EDIT ME: your email address, used only for the mailto: fallback above.
+      const EMAILJS_SERVICE_ID = "service_mvd2zgs";
+      const EMAILJS_TEMPLATE_ID = "template_6xvcmid";
+      const EMAILJS_PUBLIC_KEY = "YIaU-95-g9f3PV6gO";
       const LETTER_RECEIVER_EMAIL = "lukastojkovicalt@gmail.com";
 
       const emailjsReady =
@@ -3498,8 +3526,6 @@
           return;
         }
 
-        // Fallback: open her email client with everything prefilled, so the
-        // letter still reaches you even without any backend/API set up.
         const subject = encodeURIComponent(`Pismo iz univerzuma — za: ${to}`);
         const body = encodeURIComponent(`Za: ${to}\n\n${content}`);
         window.location.href = `mailto:${LETTER_RECEIVER_EMAIL}?subject=${subject}&body=${body}`;
@@ -3516,10 +3542,6 @@
         });
       }
 
-      /* =========================================================
-         Mini-games — unchanged from the original (pure DOM/CSS,
-         no canvas / three.js involved)
-         ========================================================= */
       const gameOverlay = document.getElementById("gameOverlay");
       const gameContainer = document.getElementById("gameContainer");
       const gameClose = document.getElementById("gameClose");
@@ -3596,9 +3618,6 @@
           .addEventListener("click", closeGameOverlay);
       }
 
-      // ---- Memory match ----
-      // EDIT ME: her face stickers — expects files at
-      // assets/stickers/1-sticker.png ... 6-sticker.png next to this HTML.
       const STICKER_COUNT = 6;
       const STICKER_EXT = "png";
       const MEMORY_STICKERS = Array.from(
@@ -3681,7 +3700,7 @@
             if (matchedCount === stickers.length) {
               markGameComplete("memory");
               pendingTimeout = setTimeout(() => {
-                showGameResult("GG! 🎉", `Rešila si u ${moves} poteza.`);
+                showGameResult("Dzidzarica", `Rešila si u ${moves} poteza.`);
               }, 500);
             }
           } else {
@@ -3708,7 +3727,6 @@
         };
       }
 
-      // ---- Star catcher ----
       function startCatcherGame() {
         gameContainer.innerHTML = `
           <p class="game-title">Catch stars ⭐</p>
@@ -3778,8 +3796,8 @@
           clearInterval(tickTimer);
           stage.querySelectorAll(".catcher-star").forEach((s) => s.remove());
           let msg;
-          if (score >= 18) msg = "Kida 🌠";
-          else if (score >= 10) msg = "Nije lose ⭐";
+          if (score >= 18) msg = "Kida";
+          else if (score >= 10) msg = "Nije loše";
           else msg = "Nubara, probaj opet 💀";
           setTimeout(() => showGameResult(`Poeni: ${score}`, msg), 300);
         }
@@ -3798,11 +3816,8 @@
         };
       }
 
-      // ---- Sima u svemiru (dodge game) ----
-      // EDIT ME: path to her dog's spaceship photo — place the file at
-      // assets/sima.png next to this HTML file.
       const SIMA_IMAGE = "assets/sima.png";
-      const SIMA_GAME_DURATION = 25; // seconds to survive
+      const SIMA_GAME_DURATION = 25;
       const SIMA_LIVES = 1;
 
       function startSimaGame() {
@@ -3837,11 +3852,11 @@
         let ended = false;
         let lives = SIMA_LIVES;
         let timeLeft = SIMA_GAME_DURATION;
-        let shipXFrac = 0.5; // 0..1 across the usable stage width
+        let shipXFrac = 0.5;
         const shipSize = 64;
         let comets = [];
         let lastSpawn = 0;
-        let spawnInterval = 950; // ms between spawns, ramps up over time
+        let spawnInterval = 950;
         let rafId = null;
         let tickTimer = null;
         let invulnerableUntil = 0;
@@ -4036,9 +4051,6 @@
         };
       }
 
-      // ---- Photo puzzle ----
-      // EDIT ME: path to your photo (place the file at assets/image.png
-      // next to this HTML file), and the grid size.
       const PUZZLE_IMAGE = "assets/image.jpg";
       const PUZZLE_GRID = 3;
 
@@ -4145,9 +4157,6 @@
         }
       }
 
-      /* =========================================================
-         Main render loop
-         ========================================================= */
       function animate(now) {
         const dt = Math.min(0.05, (now - lastFrame) / 1000);
         lastFrame = now;
@@ -4208,6 +4217,7 @@
 
       init();
       computeScrollProgress();
+      updateStoryProgress();
       requestAnimationFrame(animate);
       setTimeout(spawnShootingStar, 900);
       setTimeout(spawnShootingStar, 2600);
